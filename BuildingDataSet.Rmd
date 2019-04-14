@@ -8,7 +8,6 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 ```{r}
 
 knitr::opts_chunk$set(warning=F,error = F,message = F)
-
 install.packages(caret)
 require(recipes)
 require(tidyverse)
@@ -35,7 +34,6 @@ ASR_educ <-
 ASRraw %>%
 select (hhid, qn1h, qn1l, qn2a, qn2b, qn3a, qn3b, qn4a, qn4b, qn4c, qn4e, 
         qn4j,qn5a, qn5b,qn5c, qn6a, qn8a, qn8b, qn10a, qn10b, qn11a, qn18c, qn20, qn24a, qn25a, qn25b, qn25c)%>%
-  
 rename ("nationality"="qn1h") %>%  #"What is this person's country of citizenship?
 rename ("refugee"="qn1l") %>%  #"Is this person a refugee who entered between 2011 and 2016?
 rename("yearseduc"="qn2a") %>%   #Years of education
@@ -58,6 +56,7 @@ rename("pretaxinc2"="qn10a") %>%  #Earnings from second job
 rename("incomebasis2"="qn10b") %>%  #On what basis is pre-tax income compiled?
 rename("everworked"="qn11a") %>%  #Has this person worked since arrival to the US?
 rename("incometotal"="qn18c") %>% #Income from all sources
+mutate(incometotal= ifelse(incometotal>500000, NA, incometotal)) %>% 
 rename("employer"="qn20") %>% #Is the person working for private, federal, state, local...
 rename("training"="qn24a") %>% #Attended job training in past 12 months?
 rename("school"="qn25a") %>% #Attended school or university in past 12 months?
@@ -81,8 +80,8 @@ mutate(school=as_factor(school)) %>%
 mutate(schoolfordegree=as_factor(schoolfordegree)) %>% 
 mutate(degree=as_factor(degree))%>% 
 mutate(refugee=as_factor(refugee)) %>% 
-filter(refugee=="Yes") %>% 
-filter(incometotal<350000)
+filter(refugee=="Yes")
+
 
 glimpse(ASR_educ)
 
@@ -90,8 +89,6 @@ glimpse(ASR_educ)
 
 ```{r}
 ##### GRAPHS
-
-
 
 #Type of activity before coming to the U.S.?
 ggplot(data=subset(ASR_educ, !is.na(job_type)), aes(x = as.factor(job_type))) + 
@@ -230,7 +227,7 @@ ASR_educ2 <-
 ASR_educ %>% 
 filter (!is.na(yearseduc)) %>% 
 filter (!is.na(nationality)) %>% 
-filter (!nationality=="None")
+filter (nationality!=c("United States","Other", "None", "Refused"))
 
 
 ggplot(ASR_educ2, aes(x=nationality, y=incometotal)) + 
@@ -257,6 +254,7 @@ g + geom_density(aes(fill="tomato3"), alpha=0.5) +
  scale_y_continuous()+
 theme_classic()
 
+
 g <- ggplot(ASR_educ, aes(incometotal))
 g + geom_density(aes(fill=""), alpha=0.5) + 
     labs(title="Density plot", 
@@ -266,10 +264,12 @@ g + geom_density(aes(fill=""), alpha=0.5) +
  scale_y_continuous()+
 theme_classic()
 
+
 ASR_educ2 <-
 ASR_educ %>% 
 filter (!is.na(yearseduc)) %>% 
-filter (!is.na(nationality))  
+filter (!is.na(nationality)) %>% 
+filter (!nationality==c("United States","Other"))
 ggplot(ASR_educ2, aes(x=nationality, y=yearseduc))+
   geom_point(col="tomato2", size=3) +   # Draw points
   geom_segment(aes(x=nationality, 
@@ -279,7 +279,7 @@ ggplot(ASR_educ2, aes(x=nationality, y=yearseduc))+
                linetype="dashed", 
                size=0.1) +   # Draw dashed lines
   labs(title="Nationality and total income", 
-       subtitle="Nationality and total income earned", 
+       subtitle="Nationality and years of education", 
        caption="source: mpg") +  
   scale_y_continuous()+
   coord_flip()
