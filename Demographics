@@ -1,0 +1,140 @@
+library(haven)
+require(tidyverse)
+require(dplyr)
+require(ggplot2)
+X2016_ASR_Public_Use_File <- read_dta("Downloads/2016-ASR_Public_Use_File.dta")
+View(X2016_ASR_Public_Use_File)
+df <- read_dta("Downloads/2016-ASR_Public_Use_File.dta")
+df %>% select(qn1d,qn1f,qn1g,qn1h,qn1i,qn1k)
+> #histgram of age
+> hist(df$qn1d,xlab='age')
+> #remove don't know and refused
+> df_age <- df[(df$qn1d < 998),]
+> hist(df_age$qn1d,xlab='age')
+> 
+> #histgram of gender
+> hist(df$qn1f,xlab='gender')
+> 
+> #histgram of country of birth
+> hist(df$qn1g,xlab='country of birth')
+> #remove don't know, refused and other
+> df_coutry_birth <- df[(df$qn1g < 97),]
+> hist(df_coutry_birth$qn1g,xlab='country of birth')
+> 
+> #histgram of country of citizenship
+> hist(df$qn1h,xlab='country of citizenship')
+> #remove 96,97,98,99
+> df_coutry_citizenship <- df[(df$qn1h < 96),]
+> hist(df_coutry_citizenship$qn1h,xlab='country of citizenship')
+> 
+> #histgram of ethic origin
+> hist(df$qn1i,xlab='ethic origin')
+> #remove 97,98,99
+> df_ethic <- df[(df$qn1i< 97),]
+> hist(df_ethic$qn1i,xlab='ethic origin')
+> 
+> #histgram of state originally resettled
+> hist(df$qn1k,xlab='state originally resettled')
+> #remove 98,99
+> df_state <- df[(df$qn1k< 98),]
+> hist(df_state$qn1k,xlab='state originally resettled')
+> View(df_state)
+
+#relationship between country of birth and country of citizenship
+> df1 <- df %>% filter(qn1g < 97 & qn1h < 96)
+> ggplot(df1, aes(x=qn1g, y=qn1h)) + 
++     geom_point() + geom_abline() + 
++     labs(subtitle="birth and citizenship", 
++          y="country of citizenship", 
++          x="country of birth", 
++          title="Scatterplot")
+
+> #relationship between country of birth and country of citizenship
+> df1 <- df %>% filter(qn1g < 97 & qn1h < 96)
+> ggplot(df1, aes(x=qn1g, y=qn1h)) + 
++     geom_point() + geom_abline() + 
++     labs(subtitle="birth and citizenship", 
++          y="country of citizenship", 
++          x="country of birth", 
++          title="Scatterplot")
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+> 
+> #figure out the part > 20, if remove..almost in the straight line
+> 
+> #relationship between age and gender
+> df2 <- df %>% filter(qn1d < 998 & qn1f < 8)
+> df2$qn1d <- as.character(df2$qn1d)
+> ggplot(df2, aes(x=qn1f, y=qn1d)) + 
++     geom_histogram(stat = "identity", aes(fill=qn1d)) +
++     labs(subtitle="age and gender", 
++          y="age", 
++          x="gender")
+Warning: Ignoring unknown parameters: binwidth, bins, pad
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+> boxplot(qn1d~qn1f,df2,xlab='Gender',ylab='Age')
+Error in x[floor(d)] + x[ceiling(d)] : 
+  non-numeric argument to binary operator
+> 
+> #relationship between ethic and country of citizenship
+> 
+> df3 <- df %>% filter(qn1i < 97 & qn1h < 96)
+> df3$qn1i <- as.character(df3$qn1i)
+> df3 <-df3 %>% group_by(qn1h,qn1i) %>%
++     summarise(count=n()) %>%
++     mutate(percentage=count/sum(count))
+> ggplot(df3, aes(x=qn1h, y=percentage)) + 
++     geom_histogram(stat = "identity", aes(fill=qn1i),width =1.5) +
++     labs(subtitle="ethic in each country", 
++          y="ethic", 
++          x="country")
+Warning: Ignoring unknown parameters: binwidth, bins, pad
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+Warning message:
+position_stack requires non-overlapping x intervals 
+> #buzhidao qn1h 24 shi sha(hao xiang mei sha guanxi)
+> df3$qn1i <- as.numeric(df3$qn1i)
+> ggplot(df3, aes(x=qn1h, y=qn1i)) + 
++     geom_point() + geom_abline() + 
++     labs(subtitle="ethic in each country", 
++          y="ethic", 
++          x="country")
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+> 
+> #relationship between ethic and state originally resetteled
+> df4 <- df %>% filter(qn1i < 97 & qn1k < 98)
+> df4$qn1i <- as.character(df4$qn1i)
+> df4 <-df4 %>% group_by(qn1k,qn1i) %>%
++     summarise(count=n()) %>%
++     mutate(percentage=count/sum(count))
+> ggplot(df4, aes(x=qn1k,y=percentage)) + 
++     geom_histogram(stat = "identity", aes(fill=qn1i)) +
++     labs(subtitle="ethic in state originally resetteled", 
++          y="ethic", 
++          x="state")
+Warning: Ignoring unknown parameters: binwidth, bins, pad
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+> 
+> df4$qn1i <- as.numeric(df4$qn1i)
+> ggplot(df4, aes(x=qn1k, y=qn1i)) + 
++     geom_point() + geom_abline() + 
++     labs(subtitle="ethic in state originally resetteled", 
++          y="ethic", 
++          x="state")
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+> 
+> #relationship between ethic and gender
+> df5 <- df %>% filter(qn1i < 97 & qn1f < 8)
+> df5$qn1i <- as.character(df5$qn1i)
+> df5 <-df5 %>% group_by(qn1f,qn1i) %>%
++     summarise(count=n()) %>%
++     mutate(percentage=count/sum(count))
+> ggplot(df5, aes(x=qn1f,y=percentage)) + 
++     geom_histogram(stat = "identity", aes(fill=qn1i)) +
++     labs(subtitle="ethic by gender", 
++          y="ethic", 
++          x="gender")
+Warning: Ignoring unknown parameters: binwidth, bins, pad
+Don't know how to automatically pick scale for object of type haven_labelled. Defaulting to continuous.
+> View(df5)
+> View(df5)
