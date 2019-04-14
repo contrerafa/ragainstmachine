@@ -49,6 +49,7 @@ Q31a. In the past 12 months, have one or more persons in your household received
 2 Yes
 8 (DO NOT READ) Don’t know 
 9 (DO NOT READ) Refused
+
 ```{r}
 ggplot(ASR, aes(x = as.factor(qn31a))) +
   labs(title = "In the last month, was TANF received?") +
@@ -83,6 +84,7 @@ received Supplemental Security Income (SSI)?
 2 Yes
 8 (DO NOT READ) Don’t know 
 9 (DO NOT READ) Refused
+
 ```{r}
 ggplot(ASR, aes(x = as.factor(qn33a))) +
   labs(title = "n the past 12 months, have one or more persons in your household
