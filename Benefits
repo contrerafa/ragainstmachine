@@ -16,102 +16,95 @@ require(tidyr)
 
 
 ```{r}
-ASR <- read_dta("/Users/steffimangelsdorf/Documents/Data Science/Data Science Project/2016-ASR_Public_Use_File.dta")
-```
-
-Q30a. In the past 12 months, have one or more persons in your household received
-food stamps?
-
-```{r}
-head(ASR$qn30a)
+ASR <- read_dta("2016-ASR_Public_Use_File.dta")
 ```
 
 ```{r}
-ggplot(ASR, aes(x = as.factor(qn30a))) +
-  labs(title = "In the past 12 months, have one or more persons in your household received
-food stamps?") +
-  geom_bar(position='dodge') +
+b1 <- ggplot(ASR1, aes(x = as.factor(qn30a))) +
+  labs(title = "food stamps") +
+  geom_bar(position='dodge', width=.5, fill = "steelblue") +
+  coord_flip() +
   scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
                               "8" = "Don't know", "9" = "Refused")) +
-  xlab("Responses") +
-  ylab("Frequency")
-```
+  xlab("") +
+  ylab("")
 
-
-```{r}
-ggplot(ASR, aes(x = as.factor(qn30d))) +
-  labs(title = "How many months in the past 12 months were food stamps received?") +
-  geom_histogram()
-```
-
-Q31a. In the past 12 months, have one or more persons in your household received cash assistance through the Temporary Assistance to Needy Families (TANF) Program?
-1 No
-2 Yes
-8 (DO NOT READ) Don’t know 
-9 (DO NOT READ) Refused
-
-```{r}
-ggplot(ASR, aes(x = as.factor(qn31a))) +
-  labs(title = "In the last month, was TANF received?") +
-  geom_bar() +
+b2 <- ggplot(ASR, aes(x = as.factor(qn31a))) +
+  labs(title = "TANF") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
   scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
                               "8" = "Don't know", "9" = "Refused")) +
-  xlab("Responses") +
-  ylab("Frequency")
-```
+  xlab("") +
+  ylab("")
 
-Q32a. In the past 12 months, have one or more persons in your household
-received assistance through the Refugee Cash Assistance (RCA) program?
-1 No
-2 Yes
-8 (DO NOT READ) Don’t know 
-9 (DO NOT READ) Refused
-
-```{r}
-ggplot(ASR, aes(x = as.factor(qn32a))) +
-  labs(title = "In the past 12 months, have one or more persons in your household
-received assistance through the Refugee Cash Assistance (RCA) program?") +
-  geom_bar() +
+b3 <- ggplot(ASR, aes(x = as.factor(qn32a))) +
+  labs(title = "RCA") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
     scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
                               "8" = "Don't know", "9" = "Refused")) +
-  xlab("Responses") +
-  ylab("Frequency")
-```
+  xlab("") +
+  ylab("")
 
-Q33a. In the past 12 months, have one or more persons in your household
-received Supplemental Security Income (SSI)?
-1 No
-2 Yes
-8 (DO NOT READ) Don’t know 
-9 (DO NOT READ) Refused
-
-```{r}
-ggplot(ASR, aes(x = as.factor(qn33a))) +
-  labs(title = "n the past 12 months, have one or more persons in your household
-received Supplemental Security Income (SSI)?") +
-  geom_bar() +
+b4 <- ggplot(ASR, aes(x = as.factor(qn33a))) +
+  labs(title = "SSI") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
   scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
-                              "8" = "Don't know", "9" = "Refused")) +
-  xlab("Responses") +
-  ylab("Frequency")
-```
+                              "8" = "Don't know", "9" = "Refused")) + 
+  xlab("") +
+  ylab("")
 
-
-Q34a. In the past 12 months, have one or more persons in your household
-received income from General Assistance (GA)?
-1 No
-2 Yes
-8 (DO NOT READ) Don’t know 
-9 (DO NOT READ) Refused
-
-```{r}
-ggplot(ASR, aes(x = as.factor(qn34a))) +
+b5 <- ggplot(ASR, aes(x = as.factor(qn34a))) +
   xlim("No", "Yes") +
-  labs(title = "In the past 12 months, have one or more persons in your household
-received income from General Assistance (GA)?") +
-  geom_bar() +
+  labs(title = "GA") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
   scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
                               "8" = "Don't know", "9" = "Refused")) +
-  xlab("Responses") +
-  ylab("Frequency")
+  xlab("") +
+  ylab("")
+```
+
+```{r}
+multiplot <- function(..., plotlist=NULL, file, cols=3, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+```{r}
+multiplot(b1, b2, b3, b4, b5, cols=2)
 ```
