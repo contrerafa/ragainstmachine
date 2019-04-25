@@ -92,19 +92,18 @@ filter(refugee=="Yes")
 glimpse(ASR_educ)
 
 ```
-
+Benefits
 ```{r}
-
 #### Steffi: I create a new dataframe with the variables in which I am interested (benefits) ##
 ASR_ben <-
 ASRraw %>%
 select (hhid, qn30a, qn31a, qn32a, qn33a, qn34a)%>%
-rename ("food"="qn30a") %>%  #"What is this person's country of citizenship?
-rename ("tanf"="qn31a") %>%  #"Is this person a refugee who entered between 2011 and 2016?
-rename ("rca"="qn32a") %>%  #"Is this person a refugee who entered between 2011 and 2016?
-rename ("ssi"="qn33a") %>%  #"Is this person a refugee who entered between 2011 and 2016?
-rename ("ga"="qn34a") %>%  #"Is this person a refugee who entered between 2011 and 2016?
-```
+rename ("food"="qn30a") %>%  
+rename ("tanf"="qn31a") %>% 
+rename ("rca"="qn32a") %>% 
+rename ("ssi"="qn33a") %>% 
+rename ("ga"="qn34a") %>% 
+``` 
 
 ```{r}
 ##### GRAPHS
