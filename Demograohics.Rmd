@@ -1,0 +1,67 @@
+---
+output: pdf_document
+---
+
+```{r,warning=FALSE}
+#1
+library(readstata13)
+setwd("~/Downloads")
+df <- read.dta13("2016-ASR_Public_Use_File.dta")
+data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
+```
+
+```{r}
+name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
+names(data)<-name
+```
+
+```{r}
+#.1
+library(tidyverse)
+data <- data %>% mutate(age_group =
+                case_when(
+                  age <= 15 ~ "0-15",
+                  age <= 30 ~ "16-30",
+                  age <= 45 ~ "31-45",
+                  age <= 60 ~ "46-60",
+                  age <= 75 ~ "61-75",) 
+                )
+#drop unreasonable data
+data_filt <- data[data$age<=75,]
+ggplot(data_filt, aes(x = age,fill=age_group)) +
+  geom_histogram(aes(y=..density..))+
+  facet_wrap(.~gender,scales="free")
+```
+
+```{r}
+require(maps)
+world_map = map_data("world")
+cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
+colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
+
+C_O_B.map <- right_join(cobnumber, world_map, by = "region")
+
+ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = C_O_B.map$count))
+```
+
+```{r}
+regionnumber <- data %>% group_by(S_O_R) %>% summarize(count = n())
+colnames(regionnumber)[colnames(regionnumber)=="S_O_R"] <- "area"
+regionnumber$area[regionnumber$area==1] <- "Northeast"
+regionnumber$area[regionnumber$area==2] <- "South"
+regionnumber$area[regionnumber$area==3] <- "North Central"
+regionnumber$area[regionnumber$area==4] <- "West"
+
+ggplot2_states <- map_data("state")
+ggplot2_states$region <- str_to_title(ggplot2_states$region)
+region_data <- data.frame(region=state.name,area = state.region)
+ggplot2_statesdata <- inner_join(ggplot2_states,region_data,"region")
+ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
+
+g1 <- ggplot(data = ggplot2_statesdata,
+             mapping = aes(x = long, y = lat, group = group,fill=count))+
+  scale_fill_gradient(low = "red", high = "blue") +
+  geom_polygon(color="gray90",size=0.1)
+g1
+```
