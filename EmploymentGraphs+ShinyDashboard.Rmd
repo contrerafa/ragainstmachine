@@ -111,7 +111,7 @@ geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
   scale_y_continuous(labels = percent) +
   
   coord_flip()+
-  labs(title = "English level on arrival", x ="Proficiency", y = "Percent")
+  labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
 
 #How well does the person speak English now?
 ggplot(data=subset(ASR_educ, !is.na(eng_current)), aes(x = as.factor(eng_current))) + 
@@ -291,61 +291,9 @@ ggplot(ASR_educ2, aes(x=nationality, y=yearseduc))+
   coord_flip()
 
 ```
-
-
-
-```{r}
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("Employment Dashboard"),
-
-    # Sidebar with selection options for the different crime types
-    sidebarLayout(
-        sidebarPanel(
-            selectInput(inputId = "nationality",choices = unique(ASR_educ$nationality),
-                        label = "Select Nationality",selected = "nationality")
-        ),
-
-    
-        mainPanel(
-           plotOutput("map")
-        )
-    )
-)
-
-server <- function(input, output) {
-
-   output$map <- renderPlot({
-
-     ASR_educ %>% 
-        filter(nationality == input$nationality) %>%
-    ggplot(aes(x=nationality, y=yearseduc))+
-  geom_point(col="tomato2", size=3) +   # Draw points
-  geom_segment(aes(x=nationality, 
-                   xend=nationality, 
-                   y=min(yearseduc), 
-                   yend=max(yearseduc)), 
-               linetype="dashed", 
-               size=0.1) +   # Draw dashed lines
-  labs(title="Nationality and total income", 
-       subtitle="Nationality and years of education", 
-       caption="source: mpg") +  
-  scale_y_continuous()+
-  coord_flip()
-    })
-  
-    
-}
-
-
-shinyApp(ui = ui, server = server)
-
-```
-
 ```{r, name="Main"}
 
-uix <- fluidPage(
+uix <- fluidPage(theme = "bootstrap.css",
   
   titlePanel("American Refugee Survey - Interactive Dashboard"),
 
@@ -353,38 +301,67 @@ uix <- fluidPage(
 
       # Output: Tabset w/ plot, summary, and table
       tabsetPanel(type = "tabs",
-                  tabPanel("Home", plotOutput("home")),
-                  tabPanel("Training", plotOutput("training")),
+                  tabPanel("Home", uiOutput("home")),
+                  tabPanel("English Language", plotOutput("english_arrival")),
                   tabPanel("School", plotOutput("school")),
-                  tabPanel("Table", tableOutput("table"))
+                  tabPanel("Employer", plotOutput("employer"))
       ),
 
   fluidRow(
-    column(width = 5,
-       actionButton("action", label = "Employment and Education"),
-  
+      ),
   hr(),
-  fluidRow(column(2, verbatimTextOutput("value")))
+  fluidRow(column(2, verbatimTextOutput("value"))
 )
     ),
     column(width = 5, offset = .5
     )
   )
 
-)
 
-server_menu <- function(input, output) {
 
- output$training <- renderPlot({
-   ggplot(data=subset(ASR_educ, !is.na(training)), aes(x = as.factor(training))) + 
+
+server_menu <- function(input, output, session) {
+
+  
+### This is the home screen ###  
+  
+output$home <- renderUI({
+  
+    fluidPage(
+      
+      hr(),
+      
+      
+      
+      strong("We propose exploring the relationship between the success of refugees resettled in the United States and the characteristics of the communities that receive them. For this purpose, we are interested in analyzing data from the most recent Annual Survey of Refugees (ASR 2016) as well as datasets from the United States Census Bureau. The ASR data would allow us to paint a picture of the refugees’ progress in the country in terms of variables such as English language learning and labor force participation, thus identifying patterns of success or challenges for specific communities across the country. Using data visualization tools, this project has the potential to create a dashboard-like product which can provide a general idea of the geographic dimension of refugee resettlement and the characteristics of welcoming communities across the country.")
+    )    
+  }) 
+  
+
+### This is the home screen ###
+   output$english_arrival <- renderPlot({
+#On arrival, how well did the person speak English?
+  ggplot(data=subset(ASR_educ, !is.na(eng_arrival)), aes(x = as.factor(eng_arrival))) + 
+  geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
+    geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
+  scale_y_continuous(labels = percent) +
+  coord_flip()+
+  labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
+   })
+
+   
+   
+   output$employer <- renderPlot({
+     
+   ggplot(data=subset(ASR_educ, !is.na(employer)), aes(x = as.factor(employer))) + 
 geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
     geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
   scale_y_continuous(labels = percent) +
   coord_flip()+
-  labs(title = "Training", x = "Job type", y = "Percent")
-   })
-
-  # Generate a summary of the data ----
+  labs(title = "Who is the main employer?", x = "Industry", y = "Percent")
+   })   
+   
+  
   output$school <- renderPlot({
    ggplot(data=subset(ASR_educ, !is.na(school)), aes(x = as.factor(school))) + 
 geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
@@ -394,41 +371,6 @@ geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
   labs(title = "School", x = "Job type", y = "Percent")
    })
 
-  # Generate an HTML table view of the data ----
-  
-  output$table <- renderUI({
-    
-    output$training <- renderPlot({
-   ggplot(data=subset(ASR_educ, !is.na(training)), aes(x = as.factor(training))) + 
-geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
-    geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
-  scale_y_continuous(labels = percent) +
-  coord_flip()+
-  labs(title = "Training", x = "Job type", y = "Percent")
-   })
-    
-    sidebarLayout(
-        sidebarPanel(
-            radioButtons("dist", "Distribution type:",
-                   c("Normal" = "norm",
-                     "Uniform" = "unif",
-                     "Log-normal" = "lnorm",
-                     "Exponential" = "exp"))
-        ),
-
-    
-        mainPanel(
-           plotOutput("training")
-        )
-    )
-    
-    
-    
-    
-    
-  }) 
-
-  
 }
     
 shinyApp(ui = uix, server = server_menu)
@@ -436,58 +378,107 @@ shinyApp(ui = uix, server = server_menu)
 ```
 
 
-
 ```{r}
 
-ui <- dashboardPage(
-  dashboardHeader(), 
-  dashboardSidebar(
+ui <- dashboardPage(skin="blue",
+  dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
+  dashboardSidebar(width = 350,
     sidebarMenu(
-      # Setting id makes input$tabs give the tabName of currently-selected tab
-      id = "tabs",
-      menuItem("School", tabName = "school", icon = icon("dashboard")),
-      menuItem("Training", icon = icon("th"), tabName = "training"),
-      menuItem("Demographics", icon = icon("th"), tabName = "demographics")
-      )
+      menuItem("Dashboard", tabName = "dashboard"),
+      
+      
+      menuItem("Widgets", tabName = "widgets"),
+      
+      
+      menuItem("Employment and Education", startExpanded = TRUE,
+        menuSubItem("Schooling", tabName = "schooling"),
+        menuSubItem("English", tabName = "english_arrival"))
+      
     ),
-
+    textOutput("res")
+  ),
   dashboardBody(
-    
-    plotOutput("map"),
     tabItems(
-      tabItem("dashboard", "Widgets tab content"),
+      tabItem("dashboard", uiOutput("home")),
       tabItem("widgets", "Widgets tab content"),
-      tabItem("Demographics", "Widgets tab content")
+      tabItem("schooling", plotOutput("school")),
+      tabItem("english_arrival", plotOutput("english_arrival")) 
     )
   )
 )
 
 server <- function(input, output, session) {
+  output$res <- renderText({
+    req(input$sidebarItemExpanded)
+    paste("Expanded menuItem:", input$sidebarItemExpanded)
+  })
+}
+
+
+
+server <- function(input, output, session) {
+### This is the home screen ###  
   
-d <- reactive({
-    x <- switch(input$tabs)  
-    })
+output$home <- renderUI({
   
-  output$map <- renderPlot({
-   ggplot(data=subset(ASR_educ, !is.na(d)), aes(x = as.factor(d))) + 
+    fluidPage(
+      
+      hr(),
+      strong("We propose exploring the relationship between the success of refugees resettled in the United States and the characteristics of the communities that receive them. For this purpose, we are interested in analyzing data from the most recent Annual Survey of Refugees (ASR 2016) as well as datasets from the United States Census Bureau. The ASR data would allow us to paint a picture of the refugees’ progress in the country in terms of variables such as English language learning and labor force participation, thus identifying patterns of success or challenges for specific communities across the country. Using data visualization tools, this project has the potential to create a dashboard-like product which can provide a general idea of the geographic dimension of refugee resettlement and the characteristics of welcoming communities across the country.")
+    )    
+  }) 
+  
+
+### This is the home screen ###
+   output$english_arrival <- renderPlot({
+#On arrival, how well did the person speak English?
+  ggplot(data=subset(ASR_educ, !is.na(eng_arrival)), aes(x = as.factor(eng_arrival))) + 
+  geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
+    geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
+  scale_y_continuous(labels = percent) +
+  coord_flip()+
+  labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
+   })
+
+   output$employer <- renderPlot({
+     
+   ggplot(data=subset(ASR_educ, !is.na(employer)), aes(x = as.factor(employer))) + 
 geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
     geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
   scale_y_continuous(labels = percent) +
   coord_flip()+
-  labs(title = input$tabs, x = "Job type", y = "Percent")
+  labs(title = "Who is the main employer?", x = "Industry", y = "Percent")
+   })   
+   
+  
+  output$school <- renderPlot({
+   ggplot(data=subset(ASR_educ, !is.na(school)), aes(x = as.factor(school))) + 
+geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
+    geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
+  scale_y_continuous(labels = percent) +
+  coord_flip()+
+  labs(title = "School", x = "Job type", y = "Percent")
    })
+
 }
 
-shinyApp(ui, server)
+
+
+
+shinyApp(ui = ui, server = server)
 
 ```
 
 
+
+
+
+
+
+
+
+
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-
-
-
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
 
