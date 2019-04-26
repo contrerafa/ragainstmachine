@@ -17,6 +17,7 @@ library(haven)
 require(scales)
 require(shiny)
 require(shinydashboard)
+require(shinythemes)
 
 # Loading our main dataset, the 2016 American Survey of Refugees # 
 ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
@@ -88,14 +89,15 @@ ASR_educ <-
 
 
 
+
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
 
 
 ui <- dashboardPage(skin="black",
                     dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
                     dashboardSidebar(width = 350,
-                                     sidebarMenu(
-                                       menuItem("Home", tabName = "dashboard"),
+                                     sidebarMenu(id="sidebarmenu",
+                                       menuItem("Home", tabName = "dashboard", icon=icon("home")),
                                        
                                        
                                        menuItem("Widgets", tabName = "widgets"),
@@ -105,37 +107,58 @@ ui <- dashboardPage(skin="black",
       ## which is then coded on the server side
        
                                        menuItem("Employment and Education", startExpanded = TRUE,
-                                                menuSubItem("Schooling", tabName = "schooling"),
-                                                menuSubItem("English", tabName = "english_arrival"))
+                                                menuSubItem("Schooling", tabName = "schooling", icon=icon("graduation-cap")),
+                                                menuSubItem("Employment", tabName = "english_arrival", icon=icon("building"))),
+      
+                                       menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                        
                                        
                                        
                                      ),
                                      textOutput("res")
                                      
-                                     
+  
                                      
                                      
                     ),
                     dashboardBody(
+                      
+                      conditionalPanel(
+                        condition = "input.sidebarmenu == 'schooling'",
+                        selectInput(
+                          "breaks", "Breaks",
+                          names(ASR_educ))),
+                      
                       tabItems(
                         tabItem("dashboard", uiOutput("home")),
                         tabItem("widgets", "Widgets tab content"),
-                        tabItem("schooling", plotOutput("school")),
-                        tabItem("english_arrival", plotOutput("english_arrival")) 
+                        tabItem("schooling", plotOutput("school", )),
+                        tabItem("english_arrival", plotOutput("english_arrival")),
+                        
+                        uiOutput("text2")),
+                
+                        
+                        fluidRow(
+                        
+                        hr(),
+                        tags$footer("Refugee Dashboard - All Rights Reserved", align="center"))
                       )
                     )
-)
+
 
 server <- function(input, output, session) {
-  
-  
-  
+
   ### This is the home screen ###  
   
   output$home <- renderUI({
     
     fluidPage(
+      
+      
+      
+      tags$h1("What does the data tell us about America's refugees?"),
+      
+      tags$img(src="refugee_cover.jpg", width=500, height=300),
       
       hr(),
       
@@ -180,13 +203,33 @@ server <- function(input, output, session) {
   })   
   
   output$school <- renderPlot({
-    ggplot(data=subset(ASR_educ, !is.na(school)), aes(x = as.factor(school))) + 
+    ggplot(data=subset(ASR_educ, !is.na(eval(as.name(input$breaks)))), aes(x = as.factor(eval(as.name(input$breaks))))) + 
       geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
       geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
       scale_y_continuous(labels = percent) +
       coord_flip()+
-      labs(title = "School", x = "Job type", y = "Percent")
+      labs(title = eval(as.character(input$breaks)), x=eval(as.character(input$breaks)), y = "Percent")
   })
+  
+  output$text2 <- renderUI({
+    
+    if (input$breaks=="school") {
+      
+      fluidPage(
+      
+        br(),
+        
+        strong("We can see how the following description presents an important measure of refugee welfare")
+      )}
+    
+    ##### INSERT NEW CATEGORIES FOR TEXT HERE #######
+    
+    
+    
+    
+    
+  })
+  
   
 }
 
@@ -195,4 +238,9 @@ server <- function(input, output, session) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+## Code to deploy:
+
+rsconnect::deployApp("Dashboards/")
+
 
