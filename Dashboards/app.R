@@ -146,6 +146,9 @@ ui <- dashboardPage(skin="black",
                     )
 
 
+#### BUILDING THE SERVER SIDE OF THINGS ####
+
+
 server <- function(input, output, session) {
 
   ### This is the home screen ###  
@@ -177,9 +180,7 @@ server <- function(input, output, session) {
     for specific communities across the country.")
     )    
   }) 
-  
-  
-  ### Steffi, Diya: Use this example to code for your graph based on the tab names you specified above.  
+
   
   output$english_arrival <- renderPlot({
     #On arrival, how well did the person speak English?
@@ -191,8 +192,6 @@ server <- function(input, output, session) {
       labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
   })
   
-  
-
   output$employer <- renderPlot({
     ggplot(data=subset(ASR_educ, !is.na(employer)), aes(x = as.factor(employer))) + 
       geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
@@ -210,8 +209,9 @@ server <- function(input, output, session) {
       coord_flip()+
       labs(title = eval(as.character(input$breaks)), x=eval(as.character(input$breaks)), y = "Percent")
   })
+
   
-  output$text2 <- renderUI({
+output$text2 <- renderUI({
     
     if (input$breaks=="school") {
       
@@ -239,8 +239,8 @@ server <- function(input, output, session) {
 # Run the application 
 shinyApp(ui = ui, server = server)
 
-## Code to deploy:
 
-rsconnect::deployApp("Dashboards/")
+## Code to deploy:
+#rsconnect::deployApp("Dashboards/")
 
 
