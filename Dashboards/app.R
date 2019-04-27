@@ -56,6 +56,15 @@ ASR_educ <-
   rename("everworked"="qn11a") %>%  #Has this person worked since arrival to the US?
   rename("incometotal"="qn18c") %>% #Income from all sources
   
+  varnames <-c("highcert", "job_type", "eng_arrival", "eng_current","eng_edu_pre", 
+                            "eng_training", "eng_training_current")
+  questionslongform <-c("Highest degree obtained before coming to the U.S.?",
+                        "What was your area of work before coming to the U.S.?",
+                        "On arrival, how well did the person speak English?",
+                        "How well does the person speak English now?",
+                        "Did you receive language instruction before coming to the U.S.?",
+                        "Are you currently enrolled in a language instruction program?")
+  
   ## Recode some values as missing
   mutate(incometotal= ifelse(incometotal>500000, NA, incometotal)) %>% 
   rename("employer"="qn20") %>% #Is the person working for private, federal, state, local...
@@ -87,9 +96,15 @@ ASR_educ <-
   filter(refugee=="Yes")
 
 
+
+varnames <- names(ASR_educ)
+
+
+
+
 ### BENEFITS ###
 
-#### Steffi: I create a new dataframe with the variables in which I am interested (benefits) ##
+#### Steffi: I create a new dataframe (ASR_ben) with the variables in which I am interested (benefits) ##
 ASR_ben <-
   ASRraw %>%
   select (qn30a, qn31a, qn32a, qn33a, qn34a)%>%
@@ -161,15 +176,11 @@ ui <- dashboardPage(skin="black",
                       )
                     )
 
-
-
-
 #### BUILDING THE SERVER SIDE OF THINGS ####
 
 server <- function(input, output, session){
-  
-  
-  ### This is the home screen ###  
+
+### This is the home screen ###  
   
   output$home <- renderUI({
     
@@ -182,9 +193,7 @@ server <- function(input, output, session){
         success of refugees resettled in the United States and 
         the characteristics of the communities that receive them. 
         For this purpose, we are interested in analyzing data from 
-        the most recent Annual Survey of Refugees (ASR 2016) 
-        as well as datasets from the United States Census Bureau. 
-        The ASR data would allow us to paint a picture of the refugees’ 
+        the most recent Annual Survey of Refugees (ASR 2016) to paint a picture of the refugees’ 
         progress in the country in terms of variables such as English language 
         learning and labor force participation, 
         thus identifying patterns of success or challenges
