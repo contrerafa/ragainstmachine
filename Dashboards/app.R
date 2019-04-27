@@ -217,9 +217,7 @@ server <- function(input, output, session){
       )    
   }) 
   
-  output$age_gender <- renderPlot({
-  #The age and gender distribution for refugees
-  #group data
+  #group age data
     data <- data %>% mutate(age_group =
                 case_when(
                   age <= 15 ~ "0-15",
@@ -230,27 +228,30 @@ server <- function(input, output, session){
                 )
 #drop unreasonable data
 data_filt <- data[data$age<=75,]
+#The age and gender distribution for refugees
+output$age_gender <- renderPlot({
 ggplot(data_filt, aes(x = age,fill=age_group)) +
-  geom_histogram(aes(y=..density..))+
-  facet_wrap(.~gender,scales="free")
- 
-  output$country_origin <- renderPlot({ 
- # The country of origin distribution    
-  world_map = map_data("world")
+geom_histogram(aes(y=..density..))+
+facet_wrap(.~gender,scales="free")})
+
+world_map = map_data("world")
 cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
 colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
 C_O_B.map <- right_join(cobnumber, world_map, by = "region")
+ # The country of origin distribution       
+ output$country_origin <- renderPlot({ 
 ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = C_O_B.map$count))  
-   
-   output$state_resettle <- renderPlot({ 
- #The state of resettlement distribution
-     regionnumber <- data %>% group_by(S_O_R) %>% summarize(count = n())
+ geom_polygon(aes(fill = C_O_B.map$count))}) 
+    
+regionnumber <- data %>% group_by(S_O_R) %>% summarize(count = n())
 colnames(regionnumber)[colnames(regionnumber)=="S_O_R"] <- "area"
 regionnumber$area[regionnumber$area==1] <- "Northeast"
 regionnumber$area[regionnumber$area==2] <- "South"
 regionnumber$area[regionnumber$area==3] <- "North Central"
-regionnumber$area[regionnumber$area==4] <- "West"
+regionnumber$area[regionnumber$area==4] <- "West"  
+ 
+ #The state of resettlement distribution
+output$state_resettle <- renderPlot({ 
 ggplot2_states <- map_data("state")
 ggplot2_states$region <- str_to_title(ggplot2_states$region)
 region_data <- data.frame(region=state.name,area = state.region)
@@ -260,7 +261,7 @@ g1 <- ggplot(data = ggplot2_statesdata,
              mapping = aes(x = long, y = lat, group = group,fill=count))+
   scale_fill_gradient(low = "#330000", high = "#FFFFFF") +
   geom_polygon(color="gray90",size=0.1)
-g1
+g1})
      
   output$english_arrival <- renderPlot({
     #On arrival, how well did the person speak English?
