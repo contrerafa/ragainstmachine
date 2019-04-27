@@ -121,6 +121,13 @@ ui <- dashboardPage(skin="black",
                                                 menuSubItem("Schooling", tabName = "schooling", icon=icon("graduation-cap")),
                                                 menuSubItem("Employment", tabName = "english_arrival", icon=icon("building"))),
       
+                                     menuItem("Benefits", startExpanded = TRUE,
+                                     menuSubItem("Food Stamps", tabName = "food", icon=icon("building")),
+                                     menuSubItem("TANF", tabName = "tanf", icon=icon("building")),
+                                     menuSubItem("RCA", tabName = "rca", icon=icon("building")),
+                                     menuSubItem("SSI", tabName = "ssi", icon=icon("building")),
+                                     menuSubItem("GA", tabName = "ga", icon=icon("building"))),
+      
                                        menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                        
                                        
@@ -145,6 +152,11 @@ ui <- dashboardPage(skin="black",
                         tabItem("widgets", "Widgets tab content"),
                         tabItem("schooling", plotOutput("school", )),
                         tabItem("english_arrival", plotOutput("english_arrival")),
+                        tabItem("food", plotOutput("food")),
+                        tabItem("tanf", plotOutput("tanf")),
+                        tabItem("rca", plotOutput("rca")),
+                        tabItem("ssi", plotOutput("ssi")),
+                        tabItem("ga", plotOutput("ga")),
                         
                         uiOutput("text2")),
                 
@@ -202,8 +214,6 @@ server <- function(input, output, session) {
       labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
   })
   
-  
-
   output$employer <- renderPlot({
     ggplot(data=subset(ASR_educ, !is.na(employer)), aes(x = as.factor(employer))) + 
       geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
@@ -234,15 +244,66 @@ server <- function(input, output, session) {
       )}
     
     ##### INSERT NEW CATEGORIES FOR TEXT HERE #######
+   
+    ### Steffi Benefits ### 
     
+    output$food <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(food))) +
+        labs(title = "Food Stamps") +
+        geom_bar(position='dodge', width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) +
+        xlab("") +
+        ylab("")
+    }) 
     
-    
-    
-    
+    output$tanf <- renderPlot({
+      gplot(ASR_ben, aes(x = as.factor(tanf))) +
+        labs(title = "TANF") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) +
+        xlab("") +
+        ylab("")
   })
   
-  
-}
+    output$rca <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(rca))) +
+        labs(title = "RCA") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) +
+        xlab("") +
+        ylab("")
+    })
+    
+    output$ssi <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(ssi))) +
+        labs(title = "SSI") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) + 
+        xlab("") +
+        ylab("")
+    })
+    
+    output$ga <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(ga))) +
+        xlim("No", "Yes") +
+        labs(title = "GA") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) +
+        xlab("") +
+        ylab("")
+    })
+    }
+
 
 
 
