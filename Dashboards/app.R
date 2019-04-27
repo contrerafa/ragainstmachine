@@ -1,5 +1,4 @@
-
-## McCourt School of Public Policy - Georgetown University ####3
+## McCourt School of Public Policy - Georgetown University ####
 ## Intro to Data Science - Spring 2019 ##
 ## Team: R against the Machine #
 
@@ -103,7 +102,6 @@ ASR_ben <-
 
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
 
-
 ui <- dashboardPage(skin="black",
                     dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
                     dashboardSidebar(width = 350,
@@ -132,12 +130,7 @@ ui <- dashboardPage(skin="black",
                                        
                                        
                                        
-                                     ),
-                                     textOutput("res")
-                                     
-  
-                                     
-                                     
+                                     )
                     ),
                     dashboardBody(
                       
@@ -150,7 +143,7 @@ ui <- dashboardPage(skin="black",
                       tabItems(
                         tabItem("dashboard", uiOutput("home")),
                         tabItem("widgets", "Widgets tab content"),
-                        tabItem("schooling", plotOutput("school", )),
+                        tabItem("schooling", plotOutput("school")),
                         tabItem("english_arrival", plotOutput("english_arrival")),
                         tabItem("food", plotOutput("food")),
                         tabItem("tanf", plotOutput("tanf")),
@@ -169,41 +162,37 @@ ui <- dashboardPage(skin="black",
                     )
 
 
+
+
 #### BUILDING THE SERVER SIDE OF THINGS ####
 
-
-server <- function(input, output, session) {
-
+server <- function(input, output, session){
+  
+  
   ### This is the home screen ###  
   
   output$home <- renderUI({
     
     fluidPage(
-      
-      
-      
       tags$h1("What does the data tell us about America's refugees?"),
-      
       tags$img(src="refugee_cover.jpg", width=500, height=300),
-      
       hr(),
-      
-      
       strong(
-    "We propose exploring the relationship between the
-      success of refugees resettled in the United States and 
-    the characteristics of the communities that receive them. 
-    For this purpose, we are interested in analyzing data from 
-    the most recent Annual Survey of Refugees (ASR 2016) 
-    as well as datasets from the United States Census Bureau. 
-    The ASR data would allow us to paint a picture of the refugees’ 
-    progress in the country in terms of variables such as English language 
-    learning and labor force participation, 
-    thus identifying patterns of success or challenges
-    for specific communities across the country.")
-    )    
+        "We propose exploring the relationship between the
+        success of refugees resettled in the United States and 
+        the characteristics of the communities that receive them. 
+        For this purpose, we are interested in analyzing data from 
+        the most recent Annual Survey of Refugees (ASR 2016) 
+        as well as datasets from the United States Census Bureau. 
+        The ASR data would allow us to paint a picture of the refugees’ 
+        progress in the country in terms of variables such as English language 
+        learning and labor force participation, 
+        thus identifying patterns of success or challenges
+        for specific communities across the country.")
+      )    
   }) 
-
+  
+  
   
   output$english_arrival <- renderPlot({
     #On arrival, how well did the person speak English?
@@ -233,44 +222,14 @@ server <- function(input, output, session) {
       labs(title = eval(as.character(input$breaks)), x=eval(as.character(input$breaks)), y = "Percent")
   })
 
-  
-output$text2 <- renderUI({
-    
+  output$text2 <- renderUI({
     if (input$breaks=="school") {
-      
       fluidPage(
-      
         br(),
-        
-        strong("We can see how the following description presents an important measure of refugee welfare")
-      )}
-    
-    ##### INSERT NEW CATEGORIES FOR TEXT HERE #######
-   
-    ### BENEFITS ### 
-    
-    output$food <- renderPlot({
-      ggplot(ASR_ben, aes(x = as.factor(food))) +
-        labs(title = "Food Stamps") +
-        geom_bar(position='dodge', width=.5, fill = "steelblue") +
-        coord_flip() +
-        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
-                                  "8" = "Don't know", "9" = "Refused")) +
-        xlab("") +
-        ylab("")
-    }) 
-    
-    output$tanf <- renderPlot({
-      gplot(ASR_ben, aes(x = as.factor(tanf))) +
-        labs(title = "TANF") +
-        geom_bar(width=.5, fill = "steelblue") +
-        coord_flip() +
-        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
-                                  "8" = "Don't know", "9" = "Refused")) +
-        xlab("") +
-        ylab("")
+        strong("We can see how the following description presents an important measure of refugee welfare"))}
   })
   
+<<<<<<< HEAD
     output$rca <- renderPlot({
       ggplot(ASR_ben, aes(x = as.factor(rca))) +
         labs(title = "RCA") +
@@ -310,9 +269,66 @@ output$text2 <- renderUI({
 
 
 >>>>>>> 7063cd3f5f72987907545ee29958474290db0211
+=======
+  output$food <- renderPlot({
+    ggplot(ASR_ben, aes(x = as.factor(food))) +
+      labs(title = "Food Stamps") +
+      geom_bar(position='dodge', width=.5, fill = "steelblue") +
+      coord_flip() +
+      scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                "8" = "Don't know", "9" = "Refused")) +
+      xlab("") +
+      ylab("")
+  })
+  
+  output$tanf <- renderPlot({
+    ggplot(ASR_ben, aes(x = as.factor(tanf))) +
+      labs(title = "TANF") +
+      geom_bar(width=.5, fill = "steelblue") +
+      coord_flip() +
+      scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                "8" = "Don't know", "9" = "Refused")) +
+      xlab("") +
+      ylab("")
+  })
+  
+  output$rca <- renderPlot({
+    ggplot(ASR_ben, aes(x = as.factor(rca))) +
+      labs(title = "RCA") +
+      geom_bar(width=.5, fill = "steelblue") +
+      coord_flip() +
+      scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                "8" = "Don't know", "9" = "Refused")) +
+      xlab("") +
+      ylab("")
+  })
+  
+  output$ssi <- renderPlot({
+    ggplot(ASR_ben, aes(x = as.factor(ssi))) +
+      labs(title = "SSI") +
+      geom_bar(width=.5, fill = "steelblue") +
+      coord_flip() +
+      scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                "8" = "Don't know", "9" = "Refused")) + 
+      xlab("") +
+      ylab("")
+  })
+  
+  output$ga <- renderPlot({
+    ggplot(ASR_ben, aes(x = as.factor(ga))) +
+      xlim("No", "Yes") +
+      labs(title = "GA") +
+      geom_bar(width=.5, fill = "steelblue") +
+      coord_flip() +
+      scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                "8" = "Don't know", "9" = "Refused")) +
+      xlab("") +
+      ylab("")
+  }) 
+}
+>>>>>>> 1ff5cd0da84bd68ad8099f65a229deb7c1acea48
 
 
-# Run the application 
 shinyApp(ui = ui, server = server)
 
 
