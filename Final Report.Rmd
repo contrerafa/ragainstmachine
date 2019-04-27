@@ -110,7 +110,6 @@ b4 <- ggplot(ASR_ben, aes(x = as.factor(ssi))) +
   ylab("")
 
 b5 <- ggplot(ASR_ben, aes(x = as.factor(ga))) +
-  xlim("No", "Yes") +
   labs(title = "GA") +
   geom_bar(width=.5, fill = "steelblue") +
   coord_flip() +
