@@ -22,12 +22,10 @@ require(scales)
 require(dplyr)
 require(reshape2)
 ```
- 
 ```{r}
  ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
 ```
-## Problem Statement and Background
-
+PROBLEM STATEMENT AND BACKGROUND
 Since 1975, the United States government has welcomed over 3 million refugees for resettlement from all over the world, allowing them to build new lives and contribute to the economies of all 50 states (UNHCR, 2018). In recent years, sharp cuts to refugee resettlement quotas have sparked debate over the program’s national security implications as well as the ability of refugees to integrate into their host communities. We found that this conversation is often driven by emotional and ideological claims rather than evidence.  In light of this, we ask: what does the most recent available data tell us about refugee integration outcomes in the United States?
 
 We seek to answer this question by looking at the Annual Survey of Refugees 2016 (ASR), the most recent, nationally representative survey of refugees who were resettled in the US between 2011 and 2015. The survey was carried out by the Office of Refugee Resettlement at the U.S.Department of Health and Human Services (HHS) and offers a window into respondents' first five years in the US and their progress towards learning English, participating in the workforce, and establishing permanent residence. The dataset includes information on 1,500 households and more than 4,000 individuals, and is available as a STATA database to researchers from accredited universities.
@@ -37,28 +35,28 @@ We recognize that survey data can come with problems in terms of its reliability
 Data science tools can help build the knowledge base regarding refugee integration and equip governments with tools to optimize their institutional procedures. This can have significant consequences for the long-term livelihood of both refugees and their host communities. For instance, scientists at Stanford University have developed a flexible data-driven algorithm that uses a combination of supervised machine learning and optimal matching to discover synergies between refugee characteristics and resettlement sites, leading to roughly 40 to 70% improvements, on average, in refugees’ employment outcomes relative to current assignment practices (Bansak et al., 2018).  
 Moreover, we believe that 
 
-## Methods
-
+METHODS
 Our team downlaoded the data, cleaned, and filtered appropriate variables that allowed us easily and quickly tell the story of refugee integration across the United States. Using data visualization tools, we created a dashboard to provide a general idea of the geographic dimension of refugee resettlement and the characteristics of welcoming communities across the country. Our data visualizations and tables essentially “tell a story” about the outcomes of refugees resettled in the US in recent years. We created an interface that allows users to navigate the different visualizations and explore the various dimensions of refugee integration, comparing and contrasting the outcomes attained in these areas. The dashboard is a dynamic tool that that provides concise explanations and guides the user/reader to understand the answers we have found to the research question.
 
-## Tools
-We used the following packages: ggplot2, recipes, tidyverse, pdp, utf8, skimr, foreign, readr, haven, scales for data manipulation and visualization. Additionally, we used shiny, shindashboard, and shinythemes for our dashboard. 
+TOOLS
+First, we used Github for version control.We used the following packages: recipes, tidyverse, pdp, utf8, skimr, foreign, Ereadr, haven for data manipulation, and scales and ggplot2 for our visualizations. Additionally, we used shiny, shinydashboard, and shinythemes for our dashboard.   
 
+Problems: Github was often finicky and required manual interventions for debugging purposes. Additionally, we tried to think of ways to make our dashboard more interactive but the data itself did not much allow for this. However, the user will be able to click through different tabs, and the 'Schooling' subtab below 'Employment' has a drop-down menu with several variables to choose from. 
 
+## Diya, add something about the map challenges 
+## Rafa, any challenges creating Shiny? Should we add anything that worked particularly well? Other than the tabs and adding paragraphs? 
 
-Describe the tools that your team used and why. Justify the tools used in terms of the problem itself and the methods your team was aiming to utilize.
+## no idea how to improve any packages.. NOOOO idea. 
 
-Tools can include anything from packages used for data wrangling and visualization to machine learning and statistical processing.
-– How did you employ the tools used? What features worked well and what did not?
-– Describe any tools that you tried and ended up not using. What was the problem?
-Briefly, what could be improved in these packages to make them more functional?
-
-## Results
-
-## Employment and Schooling
+RESULTS
+## RAFA - add your results here 
+EMPLOYMENT AND SCHOOLING
 
 
 ## Benefits
+BENEFITS
+
+The policy debate in the United States is dominated by the question of how much of an economic burden refugees put on the tax system. For this reason, we created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months.  The visualizations show that for cash asssitance programs, few refugees receive them. For one, non-cash assistance programs have a higher income threshold. Additionally, the "i don't know" category is more pronounced than for cash asssistance programs, meaning that ... .... need to add more stuff here why won't this work 
 ```{r}
 #### Steffi: I create a new dataframe with the variables in which I am interested (benefits) ##
 ASR_ben <-
@@ -69,7 +67,7 @@ rename ("tanf"="qn31a") %>%
 rename ("rca"="qn32a") %>% 
 rename ("ssi"="qn33a") %>% 
 rename ("ga"="qn34a")
-
+ 
 ### Steffi: Graphs ##
 b1 <- ggplot(ASR_ben, aes(x = as.factor(food))) +
   labs(title = "Food Stamps") +
@@ -159,18 +157,11 @@ multiplot(b1, b2, b3, b4, b5, cols=2)
 ```
 
 
-## Demograhics 
-
-
-– Give a detailed summary of the results of your work. Here is where you specify the
-exact performance measures you used. Usually there will be some kind of accuracy
-or quality measure. There may also be a performance (runtime or throughput)
-measure.
-
-– Please use visualizations and tables whenever possible. Include links to interactive
-visualizations or websites if you built them.
+## Demograhics DIYA - add your results and visualizations here 
+DEMOGRAPHICS
 
 
 
+## Note to add somewhere 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
