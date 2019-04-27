@@ -1,0 +1,69 @@
+---
+title: "Project Report"
+author: "R against the Machine"
+date: "4/27/2019"
+output:
+  pdf_document: 
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Problem Statement and Background
+
+Since 1975, the United States government has welcomed over 3 million refugees for resettlement from all over the world, allowing them to build new lives and contribute to the economies of all 50 states (UNHCR, 2018). In recent year, sharp cuts to refugee resettlement quotas have sparked debate over the program’s national security implications as well as the ability of refugees to integrate into communities across the country. Hence, the key question we ask is: what does the most recent available data say about refugee integration outcomes in the United States?
+
+We attempt to answer this question by looking at the Annual Survey of Refugees 2016 (ASR), a nationally representative survey of refugees who were resettled in the US between FY 2011 and FY2015. The survey was carried out by the Office of Refugee Resettlement at the U.S.Department of Health and Human Services (HHS) and it offers a window into respondents' first five years in the US and shows the progress that refugee families made towards learning English, participating in the workforce, and establishing permanent residence. The dataset can be downloaded as a STATA file and includes information on 1,500 households and more than 4,000 individuals. 
+
+ relevant to inform decision-making surrounding the future of the refugee resettlement program in the United States and consider what programs are the most effective and for what particular group of people. 
+
+– Give a clear and complete statement of the problem. Don’t describe methods or tools yet. 
+
+Where does the data come from, what are its characteristics? 
+  
+– Include background material as appropriate: 
+
+who cares about this problem
+what impact it has
+what implications better solutions might have. 
+
+– Include a brief summary of any related work you know about.
+
+
+
+## Methods
+
+Methods
+– Describe the methods your team explored. Justify your team’s methods in terms
+of the problem statement. What methods did you consider but not use?
+– Include every method you tried, even if it did not “work”. When describing
+methods that didn’t work, make clear how they failed and any evaluation metrics
+you used to decide so.
+
+
+## Tools
+
+Describe the tools that your team used and why. Justify the tools used in terms
+of the problem itself and the methods your team was aiming to utilize.
+Tools can include anything from packages used for data wrangling and visualization to machine learning and statistical processing.
+– How did you employ the tools used? What features worked well and what did not?
+– Describe any tools that you tried and ended up not using. What was the problem?
+Briefly, what could be improved in these packages to make them more functional?
+
+## Results
+
+– Give a detailed summary of the results of your work. Here is where you specify the
+exact performance measures you used. Usually there will be some kind of accuracy
+or quality measure. There may also be a performance (runtime or throughput)
+measure.
+
+– Please use visualizations and tables whenever possible. Include links to interactive
+visualizations or websites if you built them.
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

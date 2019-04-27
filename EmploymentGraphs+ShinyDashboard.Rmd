@@ -404,6 +404,8 @@ multiplot(b1, b2, b3, b4, b5, cols=2)
 
 ```{r, name="Main"}
 
+##### THIS IS THE DASHBOARD ######
+
 uix <- fluidPage(theme = "bootstrap.css",
   
   titlePanel("American Refugee Survey - Interactive Dashboard"),
@@ -431,8 +433,6 @@ uix <- fluidPage(theme = "bootstrap.css",
   )
 
 
-
-
 server_menu <- function(input, output, session) {
 
   
@@ -441,11 +441,7 @@ server_menu <- function(input, output, session) {
 output$home <- renderUI({
   
     fluidPage(
-      
       hr(),
-      
-      
-      
       strong("We propose exploring the relationship between the success of refugees resettled in the United States and the characteristics of the communities that receive them. For this purpose, we are interested in analyzing data from the most recent Annual Survey of Refugees (ASR 2016) as well as datasets from the United States Census Bureau. The ASR data would allow us to paint a picture of the refugees’ progress in the country in terms of variables such as English language learning and labor force participation, thus identifying patterns of success or challenges for specific communities across the country. Using data visualization tools, this project has the potential to create a dashboard-like product which can provide a general idea of the geographic dimension of refugee resettlement and the characteristics of welcoming communities across the country.")
     )    
   }) 
@@ -493,6 +489,7 @@ shinyApp(ui = uix, server = server_menu)
 
 ```{r}
 
+
 ui <- dashboardPage(skin="blue",
   dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
   dashboardSidebar(width = 350,
@@ -506,6 +503,8 @@ ui <- dashboardPage(skin="blue",
       menuItem("Employment and Education", startExpanded = TRUE,
         menuSubItem("Schooling", tabName = "schooling"),
         menuSubItem("English", tabName = "english_arrival"))
+      
+      
       
     ),
     textOutput("res")
@@ -543,6 +542,7 @@ output$home <- renderUI({
   
 
 ### This is the home screen ###
+
    output$english_arrival <- renderPlot({
 #On arrival, how well did the person speak English?
   ggplot(data=subset(ASR_educ, !is.na(eng_arrival)), aes(x = as.factor(eng_arrival))) + 
@@ -553,8 +553,10 @@ output$home <- renderUI({
   labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
    })
 
+   
+   
+   
    output$employer <- renderPlot({
-     
    ggplot(data=subset(ASR_educ, !is.na(employer)), aes(x = as.factor(employer))) + 
 geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
     geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
@@ -563,7 +565,6 @@ geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
   labs(title = "Who is the main employer?", x = "Industry", y = "Percent")
    })   
    
-  
   output$school <- renderPlot({
    ggplot(data=subset(ASR_educ, !is.na(school)), aes(x = as.factor(school))) + 
 geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
