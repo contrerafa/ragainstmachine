@@ -113,6 +113,15 @@ ASR_ben <-
   rename ("ssi"="qn33a") %>% 
   rename ("ga"="qn34a")
 
+####Demographics###
+## Diya: I create a new dataframe with the variables of interest to demographics ##
+library(readstata13)
+setwd("~/Downloads")
+df <- read.dta13("2016-ASR_Public_Use_File.dta")
+data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
+name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
+names(data)<-name
+
 
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
 
@@ -140,6 +149,11 @@ ui <- dashboardPage(skin="black",
                                      menuSubItem("SSI", tabName = "ssi", icon=icon("building")),
                                      menuSubItem("GA", tabName = "ga", icon=icon("building"))),
       
+                                     menuItem("Demographics Overview", startExpanded = TRUE,
+                                     menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("building")),
+                                     menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")))
+                                     menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))))
+                                                 
                                        menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                        
                                        
@@ -164,6 +178,9 @@ ui <- dashboardPage(skin="black",
                         tabItem("rca", plotOutput("rca")),
                         tabItem("ssi", plotOutput("ssi")),
                         tabItem("ga", plotOutput("ga")),
+                        tabItem("age_gender", plotOutput("age_gender"))
+                        tabItem("country_origin", plotOutput("country_origin"))
+                        tabItem("state_resettle", plotOutput("age_gender"))
                         
                         uiOutput("text2")),
                 
@@ -200,8 +217,51 @@ server <- function(input, output, session){
       )    
   }) 
   
-  
-  
+  output$age_gender <- renderPlot({
+  #The age and gender distribution for refugees
+  #group data
+    data <- data %>% mutate(age_group =
+                case_when(
+                  age <= 15 ~ "0-15",
+                  age <= 30 ~ "16-30",
+                  age <= 45 ~ "31-45",
+                  age <= 60 ~ "46-60",
+                  age <= 75 ~ "61-75",) 
+                )
+#drop unreasonable data
+data_filt <- data[data$age<=75,]
+ggplot(data_filt, aes(x = age,fill=age_group)) +
+  geom_histogram(aes(y=..density..))+
+  facet_wrap(.~gender,scales="free")
+ 
+  output$country_origin <- renderPlot({ 
+ # The country of origin distribution    
+  world_map = map_data("world")
+cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
+colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
+C_O_B.map <- right_join(cobnumber, world_map, by = "region")
+ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = C_O_B.map$count))  
+   
+   output$state_resettle <- renderPlot({ 
+ #The state of resettlement distribution
+     regionnumber <- data %>% group_by(S_O_R) %>% summarize(count = n())
+colnames(regionnumber)[colnames(regionnumber)=="S_O_R"] <- "area"
+regionnumber$area[regionnumber$area==1] <- "Northeast"
+regionnumber$area[regionnumber$area==2] <- "South"
+regionnumber$area[regionnumber$area==3] <- "North Central"
+regionnumber$area[regionnumber$area==4] <- "West"
+ggplot2_states <- map_data("state")
+ggplot2_states$region <- str_to_title(ggplot2_states$region)
+region_data <- data.frame(region=state.name,area = state.region)
+ggplot2_statesdata <- inner_join(ggplot2_states,region_data,"region")
+ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
+g1 <- ggplot(data = ggplot2_statesdata,
+             mapping = aes(x = long, y = lat, group = group,fill=count))+
+  scale_fill_gradient(low = "#330000", high = "#FFFFFF") +
+  geom_polygon(color="gray90",size=0.1)
+g1
+     
   output$english_arrival <- renderPlot({
     #On arrival, how well did the person speak English?
     ggplot(data=subset(ASR_educ, !is.na(eng_arrival)), aes(x = as.factor(eng_arrival))) + 
@@ -270,9 +330,6 @@ server <- function(input, output, session){
         xlab("") +
         ylab("")
     })
-
-
-
 
 
   output$food <- renderPlot({
