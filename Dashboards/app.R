@@ -33,6 +33,7 @@ ASR_educ <-
   ASRraw %>%
   select (hhid, qn1h, qn1l, qn2a, qn2b, qn3a, qn3b, qn4a, qn4b, qn4c, qn4e, 
           qn4j,qn5a, qn5b,qn5c, qn6a, qn8a, qn8b, qn10a, qn10b, qn11a, qn18c, qn20, qn24a, qn25a, qn25b, qn25c)%>%
+  
   rename ("nationality"="qn1h") %>%  #"What is this person's country of citizenship?
   rename ("refugee"="qn1l") %>%  #"Is this person a refugee who entered between 2011 and 2016?
   rename("yearseduc"="qn2a") %>%   #Years of education
@@ -55,15 +56,6 @@ ASR_educ <-
   rename("incomebasis2"="qn10b") %>%  #On what basis is pre-tax income compiled?
   rename("everworked"="qn11a") %>%  #Has this person worked since arrival to the US?
   rename("incometotal"="qn18c") %>% #Income from all sources
-  
-  varnames <-c("highcert", "job_type", "eng_arrival", "eng_current","eng_edu_pre", 
-                            "eng_training", "eng_training_current")
-  questionslongform <-c("Highest degree obtained before coming to the U.S.?",
-                        "What was your area of work before coming to the U.S.?",
-                        "On arrival, how well did the person speak English?",
-                        "How well does the person speak English now?",
-                        "Did you receive language instruction before coming to the U.S.?",
-                        "Are you currently enrolled in a language instruction program?")
   
   ## Recode some values as missing
   mutate(incometotal= ifelse(incometotal>500000, NA, incometotal)) %>% 
@@ -96,7 +88,14 @@ ASR_educ <-
   filter(refugee=="Yes")
 
 
-
+varnames <-c("highcert", "job_type", "eng_arrival", "eng_current","eng_edu_pre", 
+             "eng_training", "eng_training_current")
+questionslongform <-c("Highest degree obtained before coming to the U.S.?",
+                      "What was your area of work before coming to the U.S.?",
+                      "On arrival, how well did the person speak English?",
+                      "How well does the person speak English now?",
+                      "Did you receive language instruction before coming to the U.S.?",
+                      "Are you currently enrolled in a language instruction program?")
 varnames <- names(ASR_educ)
 
 
@@ -237,8 +236,7 @@ server <- function(input, output, session){
         br(),
         strong("We can see how the following description presents an important measure of refugee welfare"))}
   })
-  
-<<<<<<< HEAD
+
     output$rca <- renderPlot({
       ggplot(ASR_ben, aes(x = as.factor(rca))) +
         labs(title = "RCA") +
@@ -272,13 +270,11 @@ server <- function(input, output, session){
         xlab("") +
         ylab("")
     })
-<<<<<<< HEAD
-  }
-=======
 
 
->>>>>>> 7063cd3f5f72987907545ee29958474290db0211
-=======
+
+
+
   output$food <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(food))) +
       labs(title = "Food Stamps") +
@@ -335,7 +331,6 @@ server <- function(input, output, session){
       ylab("")
   }) 
 }
->>>>>>> 1ff5cd0da84bd68ad8099f65a229deb7c1acea48
 
 
 shinyApp(ui = ui, server = server)
