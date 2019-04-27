@@ -88,6 +88,17 @@ ASR_educ <-
   filter(refugee=="Yes")
 
 
+### BENEFITS ###
+
+#### Steffi: I create a new dataframe with the variables in which I am interested (benefits) ##
+ASR_ben <-
+  ASRraw %>%
+  select (qn30a, qn31a, qn32a, qn33a, qn34a)%>%
+  rename ("food"="qn30a") %>%  
+  rename ("tanf"="qn31a") %>% 
+  rename ("rca"="qn32a") %>% 
+  rename ("ssi"="qn33a") %>% 
+  rename ("ga"="qn34a")
 
 
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
