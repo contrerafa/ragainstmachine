@@ -9,10 +9,23 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
+knitr::opts_chunk$set(echo = FALSE)
+require(recipes)
+require(tidyverse)
+require(pdp)
+require(utf8)
+require("skimr")
+require(foreign)
+require(readr)
+library(haven)
+require(scales)
+require(dplyr)
+require(reshape2)
 ```
  
+```{r}
+ ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
+```
 ## Problem Statement and Background
 
 Since 1975, the United States government has welcomed over 3 million refugees for resettlement from all over the world, allowing them to build new lives and contribute to the economies of all 50 states (UNHCR, 2018). In recent years, sharp cuts to refugee resettlement quotas have sparked debate over the program’s national security implications as well as the ability of refugees to integrate into communities across the country. Hence, the key question we ask is: what does the most recent available data say about refugee integration outcomes in the United States?
