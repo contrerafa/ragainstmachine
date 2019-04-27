@@ -356,7 +356,7 @@ b5 <- ggplot(ASR_ben, aes(x = as.factor(ga))) +
 
 
 ```{r}
-Steffi: ### creates multiplot ###
+### creates multiplot ###
 multiplot <- function(..., plotlist=NULL, file, cols=3, layout=NULL) {
   library(grid)
 
@@ -413,7 +413,9 @@ uix <- fluidPage(theme = "bootstrap.css",
                   tabPanel("Home", uiOutput("home")),
                   tabPanel("English Language", plotOutput("english_arrival")),
                   tabPanel("School", plotOutput("school")),
-                  tabPanel("Employer", plotOutput("employer"))
+                  tabPanel("Employer", plotOutput("employer")),
+                  tabPanel("Benefits", uiOutput("benefits")),
+                  
       ),
 
   fluidRow(
