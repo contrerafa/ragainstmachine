@@ -1,0 +1,10 @@
+name: dashboards
+title:
+username:
+account: contrerafa
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 891909
+bundleId: 2041057
+url: https://contrerafa.shinyapps.io/dashboards/
+when: 1556283030.42843
