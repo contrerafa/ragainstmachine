@@ -271,10 +271,6 @@ server <- function(input, output, session){
         ylab("")
     })
 
-
-
-
-
   output$food <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(food))) +
       labs(title = "Food Stamps") +
