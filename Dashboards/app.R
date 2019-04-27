@@ -151,8 +151,8 @@ ui <- dashboardPage(skin="black",
       
                                      menuItem("Demographics Overview", startExpanded = TRUE,
                                      menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("building")),
-                                     menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")))
-                                     menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))))
+                                     menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")),
+                                     menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))),
                                                  
                                        menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                        
@@ -178,9 +178,9 @@ ui <- dashboardPage(skin="black",
                         tabItem("rca", plotOutput("rca")),
                         tabItem("ssi", plotOutput("ssi")),
                         tabItem("ga", plotOutput("ga")),
-                        tabItem("age_gender", plotOutput("age_gender"))
-                        tabItem("country_origin", plotOutput("country_origin"))
-                        tabItem("state_resettle", plotOutput("age_gender"))
+                        tabItem("age_gender", plotOutput("age_gender")),
+                        tabItem("country_origin", plotOutput("country_origin")),
+                        tabItem("state_resettle", plotOutput("age_gender")),
                         
                         uiOutput("text2")),
                 
