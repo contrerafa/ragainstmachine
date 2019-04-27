@@ -302,7 +302,12 @@ server <- function(input, output, session) {
         xlab("") +
         ylab("")
     })
+<<<<<<< HEAD
   }
+=======
+
+
+>>>>>>> 7063cd3f5f72987907545ee29958474290db0211
 
 
 # Run the application 
@@ -312,4 +317,4 @@ shinyApp(ui = ui, server = server)
 
 rsconnect::deployApp("Dashboards/")
 
-
+ 
