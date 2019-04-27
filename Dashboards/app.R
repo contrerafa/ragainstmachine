@@ -321,7 +321,6 @@ server <- function(input, output, session){
   
   output$ga <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(ga))) +
-      xlim("No", "Yes") +
       labs(title = "In the past 12 months, have one you received income from General Assistance (GA)?") +
       geom_bar(width=.5, fill = "steelblue") +
       coord_flip() +
