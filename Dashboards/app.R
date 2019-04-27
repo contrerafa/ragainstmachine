@@ -245,7 +245,7 @@ server <- function(input, output, session) {
     
     ##### INSERT NEW CATEGORIES FOR TEXT HERE #######
    
-    ### Steffi Benefits ### 
+    ### BENEFITS ### 
     
     output$food <- renderPlot({
       ggplot(ASR_ben, aes(x = as.factor(food))) +
@@ -302,10 +302,7 @@ server <- function(input, output, session) {
         xlab("") +
         ylab("")
     })
-    }
-
-
-
+  }
 
 
 # Run the application 
