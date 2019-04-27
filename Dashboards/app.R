@@ -262,7 +262,7 @@ server <- function(input, output, session){
     output$ga <- renderPlot({
       ggplot(ASR_ben, aes(x = as.factor(ga))) +
         xlim("No", "Yes") +
-        labs(title = "GA") +
+        labs(title = "In the past 12 months, have you received cash assistance through the General Assistance (GA) Program?") +
         geom_bar(width=.5, fill = "steelblue") +
         coord_flip() +
         scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
@@ -277,7 +277,7 @@ server <- function(input, output, session){
 
   output$food <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(food))) +
-      labs(title = "Food Stamps") +
+      labs(title = "In the past 12 months, have you received Food Stamps?") +
       geom_bar(position='dodge', width=.5, fill = "steelblue") +
       coord_flip() +
       scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
@@ -288,7 +288,7 @@ server <- function(input, output, session){
   
   output$tanf <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(tanf))) +
-      labs(title = "TANF") +
+      labs(title = "In the past 12 months, have you received cash assistance through the Temporary Assistance to Needy Families (TANF) Program?") +
       geom_bar(width=.5, fill = "steelblue") +
       coord_flip() +
       scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
@@ -299,7 +299,7 @@ server <- function(input, output, session){
   
   output$rca <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(rca))) +
-      labs(title = "RCA") +
+      labs(title = "In the past 12 months, have you received assistance through the Refugee Cash Assistance (RCA) program?") +
       geom_bar(width=.5, fill = "steelblue") +
       coord_flip() +
       scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
@@ -310,7 +310,7 @@ server <- function(input, output, session){
   
   output$ssi <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(ssi))) +
-      labs(title = "SSI") +
+      labs(title = "In the past 12 months, have you received Supplemental Security Income (SSI)?") +
       geom_bar(width=.5, fill = "steelblue") +
       coord_flip() +
       scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
@@ -322,7 +322,7 @@ server <- function(input, output, session){
   output$ga <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(ga))) +
       xlim("No", "Yes") +
-      labs(title = "GA") +
+      labs(title = "In the past 12 months, have one you received income from General Assistance (GA)?") +
       geom_bar(width=.5, fill = "steelblue") +
       coord_flip() +
       scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
