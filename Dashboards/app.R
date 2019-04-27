@@ -238,6 +238,47 @@ server <- function(input, output, session){
         strong("We can see how the following description presents an important measure of refugee welfare"))}
   })
   
+<<<<<<< HEAD
+    output$rca <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(rca))) +
+        labs(title = "RCA") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) +
+        xlab("") +
+        ylab("")
+    })
+    
+    output$ssi <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(ssi))) +
+        labs(title = "SSI") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) + 
+        xlab("") +
+        ylab("")
+    })
+    
+    output$ga <- renderPlot({
+      ggplot(ASR_ben, aes(x = as.factor(ga))) +
+        xlim("No", "Yes") +
+        labs(title = "GA") +
+        geom_bar(width=.5, fill = "steelblue") +
+        coord_flip() +
+        scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                                  "8" = "Don't know", "9" = "Refused")) +
+        xlab("") +
+        ylab("")
+    })
+<<<<<<< HEAD
+  }
+=======
+
+
+>>>>>>> 7063cd3f5f72987907545ee29958474290db0211
+=======
   output$food <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(food))) +
       labs(title = "Food Stamps") +
@@ -294,6 +335,7 @@ server <- function(input, output, session){
       ylab("")
   }) 
 }
+>>>>>>> 1ff5cd0da84bd68ad8099f65a229deb7c1acea48
 
 
 shinyApp(ui = ui, server = server)
@@ -302,4 +344,4 @@ shinyApp(ui = ui, server = server)
 ## Code to deploy:
 #rsconnect::deployApp("Dashboards/")
 
-
+ 
