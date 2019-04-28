@@ -1,0 +1,50 @@
+---
+title: "Refugee Project - Final Presentation"
+author: "R against the Machine - Diya Wang, Steffi Mangelsdorf, Rafael Contreras Gomez"
+date: "4/29/2019"
+output: ioslides_presentation
+---
+
+## Problem Statement and Background
+
+What does the most recent available data tell us about refugee integration outcomes in the United States?
+
+- Annual Survey of Refugees 2016 (ASR)
+- National Policy Debate
+
+1. Who exactly are the refugees and where are they?
+2. Do refugees contribute to their local economies?
+3. Do refugees represent a burden on the tax system?
+
+## Methods
+
+
+- Exploratory Data Analysis (EDA)
+- Data visualization
+- Shiny dashboard
+- Data cleaning and wrangling
+
+## Tools
+
+
+- Git and Github
+- ggplot and ggplot2 
+- shiny and shinythemes 
+- shinydashboard 
+- Shinyapps
+
+
+## Results 
+
+
+https://contrerafa.shinyapps.io/dashboards/
+
+1. Who exactly are the refugees and where are they?
+2. Do refugees contribute to their local economies?
+3. Do refugees represent a burden on the tax system?
+
+## Lessons learned & Q & A
+
+- Graphs & packages
+- Version control 
+- Time management 
