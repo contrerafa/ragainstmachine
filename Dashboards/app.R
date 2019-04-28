@@ -3,6 +3,7 @@
 ## Team: R against the Machine #
 
 # Steffi, Diya, and Rafael ##
+#Last update: 8:39pm
 
 # Loading require libraries #
 require(recipes)
@@ -17,9 +18,12 @@ require(scales)
 require(shiny)
 require(shinydashboard)
 require(shinythemes)
+require(ggplot2)
+require(maps)
 
 # Loading our main dataset, the 2016 American Survey of Refugees # 
 ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
+
 
 
 #### Data wrangling ##
@@ -114,9 +118,10 @@ ASR_ben <-
 
 ####Demographics###
 ## Diya: I create a new dataframe with the variables of interest to demographics ##
+
 df <- ASRraw
 data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
-name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
+name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethnic_origin")
 names(data)<-name
 
 
@@ -136,9 +141,11 @@ data_filt <- data[data$age<=75,]
 
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
 
+
+
 ui <- dashboardPage(skin="black",
                     dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
-                    dashboardSidebar(width = 350,sidebarMenu(id="sidebarmenu", 
+                    dashboardSidebar(width = 350,sidebarMenu(id="feeder", 
                                                              
                                        menuItem("Home", tabName = "dashboard", icon=icon("home")),
                                        
@@ -161,8 +168,7 @@ ui <- dashboardPage(skin="black",
                                      menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("building")),
                                      menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")),
                                      menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))),
-                                       
-                                      menuItem("About the project", tabName = "about", icon=icon("info-circle"))
+                                     menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                        
                                        
                                        
@@ -172,7 +178,7 @@ ui <- dashboardPage(skin="black",
                     dashboardBody(
                       
                       conditionalPanel(
-                        condition = "input.sidebarmenu == 'home'",
+                        condition = "input.feeder == 'schooling'",
                         selectInput("breaks", "Conditions",
                           names(ASR_educ))),
                       
@@ -187,7 +193,7 @@ ui <- dashboardPage(skin="black",
                         tabItem("ga", plotOutput("ga")),
                         tabItem("age_gender", plotOutput("age_gender")),
                         tabItem("country_origin", plotOutput("country_origin")),
-                        tabItem("state_resettle", plotOutput("age_gender")),
+                        tabItem("state_resettle", plotOutput("state_resettle")),
                         
                         uiOutput("text2")),
                 
@@ -204,6 +210,9 @@ ui <- dashboardPage(skin="black",
 server <- function(input, output, session){
 
 ### This is the home screen ###  
+  
+ 
+
   
   output$home <- renderUI({
     
@@ -231,8 +240,10 @@ facet_wrap(.~gender,scales="free")})
 
 
 
- # The country of origin distribution       
- output$country_origin <- renderPlot({ 
+ # The country of origin distribution
+
+
+output$country_origin <- renderPlot({ 
    
 world_map = map_data("world")
 cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
@@ -257,6 +268,7 @@ ggplot2_states$region <- str_to_title(ggplot2_states$region)
 region_data <- data.frame(region=state.name,area = state.region)
 ggplot2_statesdata <- inner_join(ggplot2_states,region_data,"region")
 ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
+
 g1 <- ggplot(data = ggplot2_statesdata,
              mapping = aes(x = long, y = lat, group = group,fill=count))+
   scale_fill_gradient(low = "#330000", high = "#FFFFFF") +
