@@ -46,7 +46,7 @@ We summarize the results of our EDA with a dashboard that enables users to navig
 As a step prior to EDA, we did basic data cleaning and wrangling tasks to ensure the data could be rendered into visualizations.  We then coded the user interface.
 
 ##Tools
-We relied on the tidyverse and haven packages for data manipulation, particularly for importing and cleaning STATA data into R. We found difficulties understanding the nature of haven-labelled items that resulted from importing .dta, and discovered differences in coding results when we used the "readstata13" package. We ended up using haven for consistency. 
+We relied on the tidyverse and haven packages for data manipulation, particularly for importing and cleaning STATA data into R. We found difficulties understanding the nature of haven-labelled items that resulted from importing .dta, and discovered differences in coding results when we used the "readstata13" package. We ended up using haven for consistency despite we found error of incompatible types (haven_labelled/charcter) when joining the data for the map.  
 
 We employed ggplot and ggplot2 for our visualizations and relied heavily on shiny, shinydashboard, and shinythemes to be able to code the actual dashboard. To host our product online, we created a free account on Shinyapps. Building a Shiny app added an additional dimension to our data exploration, since we had to use design thinking and not only data science skills. This project also made us realize that while R can be a powerful tool for map visualization and dashboard building, this is perhaps not the language's competitive advantage. We wonder whether other (although more expensive) resources such as Tableau would be better suited for these tasks.
 
