@@ -60,7 +60,9 @@ We reviewed the demographic composition of the refugee survey data and find:
 
 - The largest group of refugees were born in Iraq, which counts 1567. following by 611 for Bhutan and 513 for Burma.From the map, we can see that the refugess are mainly from the Middle East, Southeast Asia, and Africa.
 - The South and the North Central have very close resettlement counts, while the Northeast has the least count comparing to other three regions. 
-- Refugees in age groups 16-30 and 31-45 represent the majority of the distribution. take the most count in refugee age distribution. When we factor in gender, we find that there isn't significant difference between male and female refugees.
+- Refugees in age groups 16-30 and 31-45 represent the majority of the distribution. take the most count in refugee age distribution. When we factor in gender, we find that there isn't significant difference between male (1) and female (2) refugees.
+
+
 ```{r results='hide', message=FALSE, warning=FALSE}
 df <- ASRraw
 data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
@@ -94,11 +96,11 @@ regionnumber$area[regionnumber$area==4] <- "West"
 ###graphs###
 #1
 ggplot(data_filt, aes(x = age,fill=age_group)) +
-  geom_histogram(aes(y=..density..))+labs(title = "Age and Gender Distribution")+
+  geom_histogram(aes(y=..density..))+labs(title = "Age and Gender Distribution", x="1 - Male, 2 - Female")+
   facet_wrap(.~gender,scales="free")
 
 #2
-b8 <- ggplot(data_filt,aes(x=age,y=count,fill=age_group))+geom_histogram(aes(y=..count..))
+b8 <- ggplot(data_filt,aes(x=age,y=count,fill=age_group))+geom_histogram(aes(y=..count..))+labs(title = "Age Distribution")
 ```
 
 
@@ -292,6 +294,7 @@ Do refugees actually contribute to the economy of the countries? Our research fi
 ```{r results='hide', message=FALSE, warning=FALSE}
 multiplot(b6, b7,cols=2)
 ```
+
 #3. Do refugees represent a burden on the tax system?
 The policy debate in the United States emphasizes the economic burden refugees put on the tax system.  We created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months. We find that: 
 - Few refugees receive cash assistance programs. 
@@ -299,8 +302,7 @@ The policy debate in the United States emphasizes the economic burden refugees p
 - TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. 
 - less than 5% of survey takers utilize cash assistance program; the exception here is SSI, but even those are outweighted by those that do not receive SSI. 
 - SNAP is an outlier this is likely the case because income elibigilty thresholds are much lower and are available for households with children. 
+
 ```{r results='hide', message=FALSE, warning=FALSE}
 multiplot(b1, b2,cols=2)
-g1
-b8
 ```
