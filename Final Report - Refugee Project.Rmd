@@ -287,9 +287,8 @@ multiplot <- function(..., plotlist=NULL, file, cols=3, layout=NULL) {
 #2. Do refugees contribute to their local economies?
 Do refugees actually contribute to the economy of the countries? Our research finds that...
 
-- RESULT 1
-- RESULT 2
-- RESULT 3
+- Approximately a quarter of refugees spoke English well or very well on arrival. Most refugees did not have a good grasp on the English language upon arrival, representing challenges on integration efforts. For example, low English skills create entry barriers to schooling, employment, housing, and more.  
+- The second graph shows that the majority of refugees are not in school. While this includes refugees that aged out of regular schooling age, it nonetheless represents an interesting perspective that nearly a third of refugees go on to gain an education. 
 
 ```{r results='hide', message=FALSE, warning=FALSE}
 multiplot(b6, b7,cols=2)
