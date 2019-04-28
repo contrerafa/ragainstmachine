@@ -1,5 +1,7 @@
 ---
-output: pdf_document
+output:
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r,warning=FALSE}
@@ -13,6 +15,8 @@ data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"St
 ```{r}
 name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
 names(data)<-name
+head(data)
+
 ```
 
 ```{r}
@@ -29,8 +33,9 @@ data <- data %>% mutate(age_group =
 #drop unreasonable data
 data_filt <- data[data$age<=75,]
 ggplot(data_filt, aes(x = age,fill=age_group)) +
-  geom_histogram(aes(y=..density..))+
+  geom_histogram(aes(y=..density..))+labs(title = "Age and Gender Distribution")+
   facet_wrap(.~gender,scales="free")
+ ggplot(data_filt,aes(x=age,y=count,fill=age_group))+labs(title = "Age Distribution")+geom_histogram(aes(y=..count..))
 ```
 
 ```{r}
@@ -38,11 +43,10 @@ require(maps)
 world_map = map_data("world")
 cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
 colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
-
 C_O_B.map <- right_join(cobnumber, world_map, by = "region")
 
 ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = C_O_B.map$count))
+  geom_polygon(aes(fill = C_O_B.map$count))+labs(title = "Country of Birth Distribution")
 ```
 
 ```{r}
@@ -61,7 +65,8 @@ ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
 
 g1 <- ggplot(data = ggplot2_statesdata,
              mapping = aes(x = long, y = lat, group = group,fill=count))+
-  scale_fill_gradient(low = "red", high = "blue") +
-  geom_polygon(color="gray90",size=0.1)
+  scale_fill_gradient (low = "#330000", high = "#FFFFFF") +
+  geom_polygon(color="gray90",size=0.1)+labs(title = "State of Resettlement Distribution")
 g1
 ```
+
