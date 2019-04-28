@@ -91,16 +91,15 @@ ASR_educ <-
   filter(refugee=="Yes")
 
 
-varnames <-c("highcert", "job_type", "eng_arrival", "eng_current","eng_edu_pre", 
-             "eng_training", "eng_training_current")
-questionslongform <-c("Highest degree obtained before coming to the U.S.?",
-                      "What was your area of work before coming to the U.S.?",
-                      "On arrival, how well did the person speak English?",
-                      "How well does the person speak English now?",
-                      "Did you receive language instruction before coming to the U.S.?",
-                      "Are you currently enrolled in a language instruction program?")
-varnames <- names(ASR_educ)
+options_education<-c("Years of education prior to arrival", "Highest certificate before arriving to the U.S", "Attended training in past 12 months", "Attended school or university in past 12 months",
+                    "If in school, what degree are you pursuing?") 
+                    
 
+ASR_educ2 <-
+  ASR_educ %>% 
+  filter (!is.na(yearseduc)) %>% 
+  filter (!is.na(nationality)) %>% 
+  filter (nationality!=c("United States","Other", "None", "Refused"))
 
 
 
@@ -121,7 +120,7 @@ ASR_ben <-
 
 df <- ASRraw
 data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
-name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethnic_origin")
+name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
 names(data)<-name
 
 
@@ -151,37 +150,58 @@ ui <- dashboardPage(skin="black",
       ####  See how the name of each item is then used later to create an action, either uiOutput or plotOutput
       ## which is then coded on the server side
        
-                                       menuItem("Employment and Education",
-                                                menuSubItem("Schooling", tabName = "schooling", icon=icon("graduation-cap")),
-                                                menuSubItem("Employment", tabName = "english_arrival", icon=icon("building"))),
       
-                                     menuItem("Benefits",
-                                     menuSubItem("SNAP", tabName = "food", icon=icon("carrot")),
+                                    menuItem("Demographics Overview", startExpanded = TRUE,
+                                    menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("user-check")),
+                                    menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("passport")),
+                                    menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("plane-arrival"))),
+                                    
+      
+                                       menuItem("Employment and Education", startExpanded = TRUE,
+                                                menuSubItem("Education & Training", tabName = "education", icon=icon("graduation-cap")),
+                                                menuSubItem("Employment", tabName = "employment", icon=icon("briefcase"))),
+      
+                                     menuItem("Benefits", startExpanded = TRUE,
+                                     menuSubItem("SNAP", tabName = "food", icon=icon("apple-alt")),
                                      menuSubItem("TANF", tabName = "tanf", icon=icon("money-check-alt")),
                                      menuSubItem("RCA", tabName = "rca", icon=icon("money-check-alt")),
                                      menuSubItem("SSI", tabName = "ssi", icon=icon("money-check-alt")),
                                      menuSubItem("GA", tabName = "ga", icon=icon("money-check-alt"))),
-      
-                                     menuItem("Demographics Overview",
-                                     menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("building")),
-                                     menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")),
-                                     menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))),
-                                     menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                       
+                                    menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                      )
                     ),
       
                     dashboardBody(
                       
                       conditionalPanel(
-                        condition = "input.feeder == 'schooling'",
-                        selectInput("breaks", "Conditions",
-                          names(ASR_educ))),
+                        condition = "input.feeder == 'education'",
+                        selectInput("edu_outcomes", "Select the education outcome of interest:", 
+                                    c("Highest certificate before arriving to the U.S" = "highcert",
+                                      "Years of education prior to arrival" = "yearseduc",
+                                      "Has this person attended school or university in past 12 months?"="school",
+                                      "What degree is the person attempting to earn?"="degree",
+                                      "On arrival, how well did the person speak English?" = "eng_arrival",
+                                      "How well does the person speak English now?" = "eng_current",
+                                      "Did the person receive language instruction before coming to the U.S.?" ="eng_edu_pre",
+                                      "Is the person currently enrolled in English language training?" ="eng_training_current"))),
+                                  
+                                    conditionalPanel(
+                                      condition = "input.feeder == 'employment'",
+                                      selectInput("job_outcomes", "Select the employment outcome of interest:", 
+                                                  c("Did the person work at a job anytime last week?" = "work",
+                                                    "Has this person worked since arrival to the US?" = "everworked",
+                                                    "For what kind of employer is this person working?" = "employer",
+                                                    "Has this person attended job training in past 12 months?" = "training",
+                                                    "What was this person's income from all sources?"="incometotal")                
+                                    
+                                    
+                                    )),
                       
                       tabItems(
                         tabItem("dashboard", uiOutput("home")),
-                        tabItem("schooling", plotOutput("school")),
-                        tabItem("english_arrival", plotOutput("english_arrival")),
+                        tabItem("education", plotOutput("education")),
+                        tabItem("employment", plotOutput("employment")),
                         tabItem("food", plotOutput("food")),
                         tabItem("tanf", plotOutput("tanf")),
                         tabItem("rca", plotOutput("rca")),
@@ -206,9 +226,6 @@ ui <- dashboardPage(skin="black",
 server <- function(input, output, session){
 
 ### This is the home screen ###  
-  
- 
-
   
   output$home <- renderUI({
     
@@ -271,36 +288,181 @@ g1 <- ggplot(data = ggplot2_statesdata,
   geom_polygon(color="gray90",size=0.1)
 g1})
      
-  output$english_arrival <- renderPlot({
-    #On arrival, how well did the person speak English?
-    ggplot(data=subset(ASR_educ, !is.na(eng_arrival)), aes(x = as.factor(eng_arrival))) + 
-      geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
-      geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
-      scale_y_continuous(labels = percent) +
-      coord_flip()+
-      labs(title = "On arrival, how well did the person speak English?", x ="Proficiency", y = "Percent")
-  })
   
-  output$employer <- renderPlot({
-    ggplot(data=subset(ASR_educ, !is.na(employer)), aes(x = as.factor(employer))) + 
+  output$employment <- renderPlot({
+    
+    graph<-
+      ggplot(data=subset(ASR_educ, !is.na(eval(as.name(input$job_outcomes)))), aes(x = as.factor(eval(as.name(input$job_outcomes))))) + 
       geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
       geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
       scale_y_continuous(labels = percent) +
-      coord_flip()+
-      labs(title = "Who is the main employer?", x = "Industry", y = "Percent")
-  })   
+      coord_flip()
+    
   
-  output$school <- renderPlot({
-    ggplot(data=subset(ASR_educ, !is.na(eval(as.name(input$breaks)))), aes(x = as.factor(eval(as.name(input$breaks))))) + 
+  if (input$job_outcomes=="work") {
+    graph <- graph+labs(title ="Did the person work at a job anytime last week?",
+                        x="Worked", 
+                        y = "Percent",
+                        caption = "We can see how the following description presents an important measure of refugee welfare")+
+      theme(
+        plot.caption = element_text(size=16, hjust=0.5)
+      )
+    print(graph)
+  }
+  
+    if (input$job_outcomes=="everworked") {
+      graph <- graph+labs(title ="Has this person worked since their arrival to the US?",
+                          x="Worked", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }  
+    
+    
+  if (input$job_outcomes=="employer") {
+    graph <- graph+labs(title = "For what kind of employer is this person working?",
+                        x="Employer", 
+                        y = "Percent",
+                        caption = "We can see how the following description presents an important measure of refugee welfare")+
+      theme(
+        plot.caption = element_text(size=16, hjust=0.5)
+      )
+    print(graph)
+  }
+
+  if (input$job_outcomes=="training") {
+    graph <- graph+labs(title = "Has this person attended job training in past 12 months?",
+                        x="Training", 
+                        y = "Percent",
+                        caption = "We can see how the following description presents an important measure of refugee welfare")+
+      theme(
+        plot.caption = element_text(size=16, hjust=0.5)
+      )
+    print(graph)
+  }
+  
+  if (input$job_outcomes=="incometotal") {
+    graph <-ggplot(ASR_educ2, aes(incometotal))+geom_density(aes(fill="tomato3"), alpha=0.5) + 
+      labs(title="Density plot", 
+           subtitle="Reported income from all sources",
+           caption = "We can see how the following description presents an important measure of refugee welfare",
+           x="Income total (in US$)")+
+      scale_y_continuous() +
+      theme(plot.caption = element_text(size=16, hjust=0.5), axis.title.y=element_blank())
+    print(graph)
+  }
+  
+  }) 
+  
+  
+  output$education <- renderPlot({
+  
+    graph<-
+      ggplot(data=subset(ASR_educ, !is.na(eval(as.name(input$edu_outcomes)))), aes(x = as.factor(eval(as.name(input$edu_outcomes))))) + 
       geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
       geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
       scale_y_continuous(labels = percent) +
-      coord_flip()+
-      labs(title = eval(as.character(input$breaks)), x=eval(as.character(input$breaks)), y = "Percent")
+      coord_flip()
+      
+    if (input$edu_outcomes=="yearseduc") {
+  
+      graph <- ggplot(ASR_educ, aes(yearseduc))+
+        geom_density(aes(fill="tomato3"), alpha=0.5) + 
+        labs(title="Years of education prior to arrival", 
+             subtitle="Years of education reported",
+             caption="We can see how the following description presents an important measure of refugee welfare",
+             x="Years of education")+
+        theme_classic()+theme(plot.caption = element_text(size=16, hjust=0.5))
+      print(graph)
+    }
+
+    if (input$edu_outcomes=="highcert") {
+     graph <- graph+labs(title ="What was the highest certificate you obtained prior to arriving to the U.S?",
+                         x="Certificate", 
+                         y = "Percent",
+                         caption = "We can see how the following description presents an important measure of refugee welfare")+
+       theme(
+         plot.caption = element_text(size=16, hjust=0.5)
+       )
+     print(graph)
+    }
+     
+    if (input$edu_outcomes=="school") {
+      graph <- graph+labs(title ="Has this person attended school or university in past 12 months?",
+                          x="Attended school", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }
+    
+
+    if (input$edu_outcomes=="degree") {
+      graph <- graph+labs(title ="What degree is the person attempting to earn?",
+                          x="English proficiency", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }
+    
+    
+    if (input$edu_outcomes=="eng_arrival") {
+      graph <- graph+labs(title ="On arrival, how well did the person speak English?",
+                          x="English proficiency", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }
+    
+    if (input$edu_outcomes=="eng_current") {
+      graph <- graph+labs(title ="How well does the person speak English now?",
+                          x="English proficiency", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }
+    
+    if (input$edu_outcomes=="eng_edu_pre") {
+      graph <- graph+labs(title ="Did the person receive language instruction before coming to the U.S.?",
+                          x="Received training", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }
+    
+    if (input$edu_outcomes=="eng_training_current") {
+      graph <- graph+labs(title = "Is the person currently enrolled in English language training?",
+                          x="Enrolled", 
+                          y = "Percent",
+                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+        theme(
+          plot.caption = element_text(size=16, hjust=0.5)
+        )
+      print(graph)
+    }
+    
+    
   })
 
   output$text2 <- renderUI({
-    if (input$breaks=="school") {
+    if (input$edu_outcomes=="school") {
       fluidPage(
         br(),
         strong("We can see how the following description presents an important measure of refugee welfare"))}
@@ -343,7 +505,7 @@ g1})
 
   output$food <- renderPlot({
     ggplot(ASR_ben, aes(x = as.factor(food))) +
-      labs(title = "In the past 12 months, have you received Food Stamps?") +
+      labs(title = "In the past 12 months, have you received food stamps?") +
       geom_bar(position='dodge', width=.5, fill = "steelblue") +
       coord_flip() +
       scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
