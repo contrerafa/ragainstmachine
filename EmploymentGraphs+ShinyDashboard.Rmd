@@ -253,8 +253,8 @@ ggplot(ASR_educ2, aes(x=nationality, y=incometotal)) +
 
 ##### DENSITY PLOT ######
 
-g <- ggplot(ASR_educ, aes(yearseduc))
-g + geom_density(aes(fill="tomato3"), alpha=0.5) + 
+graph <- ggplot(ASR_educ, aes(yearseduc))+
+geom_density(aes(fill="tomato3"), alpha=0.5) + 
     labs(title="Density plot", 
          subtitle="Years of education reported",
          caption="Source: mpg",
