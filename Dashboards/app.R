@@ -141,8 +141,6 @@ data_filt <- data[data$age<=75,]
 
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
 
-
-
 ui <- dashboardPage(skin="black",
                     dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
                     dashboardSidebar(width = 350,sidebarMenu(id="feeder", 
@@ -169,9 +167,7 @@ ui <- dashboardPage(skin="black",
                                      menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")),
                                      menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))),
                                      menuItem("About the project", tabName = "about", icon=icon("info-circle"))
-                                       
-                                       
-                                       
+                                      
                                      )
                     ),
       
