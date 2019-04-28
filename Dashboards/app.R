@@ -9,7 +9,7 @@ require(recipes)
 require(tidyverse)
 require(pdp)
 require(utf8)
-require("skimr")
+require(skimr)
 require(foreign)
 require(readr)
 library(haven)
@@ -23,7 +23,6 @@ ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
 
 
 #### Data wrangling ##
-
 
 ### EMPLOYMENT AND EDUCATION ###
 
@@ -115,62 +114,70 @@ ASR_ben <-
 
 ####Demographics###
 ## Diya: I create a new dataframe with the variables of interest to demographics ##
-library(readstata13)
-setwd("~/Downloads")
-df <- read.dta13("2016-ASR_Public_Use_File.dta")
+df <- ASRraw
 data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
 name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
 names(data)<-name
+
+
+#group age data
+data <- data %>% mutate(age_group =
+                          case_when(
+                            age <= 15 ~ "0-15",
+                            age <= 30 ~ "16-30",
+                            age <= 45 ~ "31-45",
+                            age <= 60 ~ "46-60",
+                            age <= 75 ~ "61-75") 
+)
+#drop unreasonable data
+data_filt <- data[data$age<=75,]
+#The age and gender distribution for refugees
 
 
 ##### BUILDING THE USER INTERFACE FOR THE DASHBOARD #######
 
 ui <- dashboardPage(skin="black",
                     dashboardHeader(title="ASR Interactive Dashboard", titleWidth = 350), 
-                    dashboardSidebar(width = 350,
-                                     sidebarMenu(id="sidebarmenu",
+                    dashboardSidebar(width = 350,sidebarMenu(id="sidebarmenu", 
+                                                             
                                        menuItem("Home", tabName = "dashboard", icon=icon("home")),
-                                       
-                                       
-                                       menuItem("Widgets", tabName = "widgets"),
                                        
        #### Steffi, Diya: Follow this example to include more items and subitems. Keep track of the , and ()
       ####  See how the name of each item is then used later to create an action, either uiOutput or plotOutput
       ## which is then coded on the server side
        
-                                       menuItem("Employment and Education", startExpanded = TRUE,
+                                       menuItem("Employment and Education",
                                                 menuSubItem("Schooling", tabName = "schooling", icon=icon("graduation-cap")),
                                                 menuSubItem("Employment", tabName = "english_arrival", icon=icon("building"))),
       
-                                     menuItem("Benefits", startExpanded = TRUE,
+                                     menuItem("Benefits",
                                      menuSubItem("Food Stamps", tabName = "food", icon=icon("building")),
                                      menuSubItem("TANF", tabName = "tanf", icon=icon("building")),
                                      menuSubItem("RCA", tabName = "rca", icon=icon("building")),
                                      menuSubItem("SSI", tabName = "ssi", icon=icon("building")),
                                      menuSubItem("GA", tabName = "ga", icon=icon("building"))),
       
-                                     menuItem("Demographics Overview", startExpanded = TRUE,
+                                     menuItem("Demographics Overview",
                                      menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("building")),
                                      menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("building")),
                                      menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("building"))),
-                                                 
-                                       menuItem("About the project", tabName = "about", icon=icon("info-circle"))
+                                       
+                                      menuItem("About the project", tabName = "about", icon=icon("info-circle"))
                                        
                                        
                                        
                                      )
                     ),
+      
                     dashboardBody(
                       
                       conditionalPanel(
-                        condition = "input.sidebarmenu == 'schooling'",
-                        selectInput(
-                          "breaks", "Breaks",
+                        condition = "input.sidebarmenu == 'home'",
+                        selectInput("breaks", "Conditions",
                           names(ASR_educ))),
                       
                       tabItems(
                         tabItem("dashboard", uiOutput("home")),
-                        tabItem("widgets", "Widgets tab content"),
                         tabItem("schooling", plotOutput("school")),
                         tabItem("english_arrival", plotOutput("english_arrival")),
                         tabItem("food", plotOutput("food")),
@@ -217,29 +224,21 @@ server <- function(input, output, session){
       )    
   }) 
   
-  #group age data
-    data <- data %>% mutate(age_group =
-                case_when(
-                  age <= 15 ~ "0-15",
-                  age <= 30 ~ "16-30",
-                  age <= 45 ~ "31-45",
-                  age <= 60 ~ "46-60",
-                  age <= 75 ~ "61-75",) 
-                )
-#drop unreasonable data
-data_filt <- data[data$age<=75,]
-#The age and gender distribution for refugees
 output$age_gender <- renderPlot({
 ggplot(data_filt, aes(x = age,fill=age_group)) +
 geom_histogram(aes(y=..density..))+
 facet_wrap(.~gender,scales="free")})
 
+
+
+ # The country of origin distribution       
+ output$country_origin <- renderPlot({ 
+   
 world_map = map_data("world")
 cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
 colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
 C_O_B.map <- right_join(cobnumber, world_map, by = "region")
- # The country of origin distribution       
- output$country_origin <- renderPlot({ 
+   
 ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
  geom_polygon(aes(fill = C_O_B.map$count))}) 
     
@@ -251,6 +250,7 @@ regionnumber$area[regionnumber$area==3] <- "North Central"
 regionnumber$area[regionnumber$area==4] <- "West"  
  
  #The state of resettlement distribution
+
 output$state_resettle <- renderPlot({ 
 ggplot2_states <- map_data("state")
 ggplot2_states$region <- str_to_title(ggplot2_states$region)
