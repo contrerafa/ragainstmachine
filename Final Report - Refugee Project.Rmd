@@ -32,11 +32,13 @@ require(reshape2)
 ##Problem Statement and Background
 Since 1975, the United States government has welcomed over 3 million refugees for resettlement from all over the world (UNHCR, 2018). Recent cuts to refugee resettlement quotas have sparked debate over the program’s national security implications and the ability of refugees to integrate into their host communities. We found that this conversation is often driven by emotional and ideological claims rather than evidence.  Thus, we ask: what does the most recent available data tell us about refugee integration outcomes in the United States?
 
-We seek to answer this question by looking at the Annual Survey of Refugees 2016 (ASR), the most recent, nationally representative survey of refugees who were resettled in the US between 2011 and 2015. The survey was carried out by the Office of Refugee Resettlement at the U.S.Department of Health and Human Services (HHS) and offers a window into respondents' first five years in the US and their progress towards learning English, participating in the workforce, and establishing permanent residence. The dataset includes information on 1,500 households and more than 4,000 individuals, and is available as a STATA database to researchers from accredited universities.
+We seek to answer this question by looking at the Annual Survey of Refugees 2016 (ASR), the most recent, nationally representative survey of refugees who were resettled in the US between 2011 and 2015. The survey was carried out by the Office of Refugee Resettlement at the U.S. Department of Health and Human Services (HHS) and offers a window into respondents' first five years in the US and their progress towards learning English, participating in the workforce, and establishing permanent residence. The dataset includes information on 1,500 households and more than 4,000 individuals, and is available as a STATA database to researchers from accredited universities.
 
 We recognize that survey data can come with problems in terms of its reliability and external validity. However, for this particularly policy area, there is a huge gap in capturing refugee data with very few agencies collecting information (other than ASR, the only other data sources are the Census Bureau data: American Community Survey (ACS) and the New Immigrant Survey). 
 
-Data science tools can equip governments with tools to optimize their institutional procedures.  Scientists at Stanford University have developed a data-driven algorithm that uses supervised machine learning to discover synergies between refugees and resettlement sites, leading to 40 to 70% improvements, on average, in refugees’ employment outcomes relative to current assignment practices (Bansak et al., 2018).  
+Data science tools can equip governments with tools to optimize their institutional procedures.  Scientists at Stanford University have developed a data-driven algorithm that uses supervised machine learning to discover synergies between refugees and resettlement sites, leading to 40 to 70% improvements, on average, in refugees’ employment outcomes relative to current assignment practices.[^1]  
+
+[^1]: Bansak, K., Ferwerda, J., Hainmueller, J., Dillon, A., Hangartner, D., Lawrence, D., & Weinstein, J. (2018). Improving refugee integration through data-driven algorithmic assignment. Science, 359(6373), 325-329. 
 
 ##Methods
 Exploratory Data Analysis (EDA) allowed us to open-mindedly explore and gain significant insight into the survey results and answer our research question. We were also drawn by the potential that data visualization has to communicate our findings. We had considered creating a linear probability or machine learning model to predict the likelihood of a refugee household being successful at resettling. This approach was discarded because of data availability, the complexity of defining resettlement in strictly quantitative terms, and seeking to maximize our project's reach beyond specialized audiences. 
@@ -52,17 +54,19 @@ We employed ggplot and ggplot2 for our visualizations and relied heavily on shin
 
 Through the coding process we used Git and the Github platform for version control. While it overall served its purpose, we often found that it presented complications when edits were being made in real time. 
 
-#Results
+# Results
+
+We have compiled the results of our EDA analysis into a
+[\underline{dashboard}](https://contrerafa.shinyapps.io/dashboards/) deployed and accessible via ShinyApps. The target audience of the dashboard is the general public interested in discovering the evidence behind refugee outcomes. 
+
 We have decided to articulate our discussion of results around three questions that capture the main doubts we had going into the process of data exploration: 
 
 ## 1. Who exactly are the refugees and where are they?
 We reviewed the demographic composition of the refugee survey data and find: 
 
-- The largest group of refugees were born in Iraq, which counts 1567. following by 611 for Bhutan and 513 for Burma.From the map, we can see that the refugess are mainly from the Middle East, Southeast Asia, and Africa.
-- The South and the North Central have very close resettlement counts, while the Northeast has the least count comparing to other three regions. 
+- The largest group of refugees in the sample were born in Iraq, totaling 1567. They were closely followed by Bhutan (611) and 513 for Burma/Myanmar. We can notice the absence of large numbers of Syrian refugees, perhaps indicating that their arrival ocurred after the sample was taken. 
 - Refugees in age groups 16-30 and 31-45 represent the majority of the distribution. take the most count in refugee age distribution. When we factor in gender, we find that there isn't significant difference between male (1) and female (2) refugees.
-
-
+- The South and the Northern central region of the United States seem to have very similar resettlement counts, while the Northeast has the fewer number of refugees, compared to the other regions. 
 ```{r results='hide', message=FALSE, warning=FALSE}
 df <- ASRraw
 data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
@@ -284,22 +288,23 @@ multiplot <- function(..., plotlist=NULL, file, cols=3, layout=NULL) {
   }
 }
 ```
-#2. Do refugees contribute to their local economies?
-Do refugees actually contribute to the economy of the countries? Our research finds that...
+## 2.What do we know about the education and employment outcomes of refugees?
+A common question surrounding refugees is their ability to make decisions about their employment and education that can increase their financial and human capital. Our analysis found that:
 
-- Approximately a quarter of refugees spoke English well or very well on arrival. Most refugees did not have a good grasp on the English language upon arrival, representing challenges on integration efforts. For example, low English skills create entry barriers to schooling, employment, housing, and more.  
-- The second graph shows that the majority of refugees are not in school. While this includes refugees that aged out of regular schooling age, it nonetheless represents an interesting perspective that nearly a third of refugees go on to gain an education. 
+- 1 in every 4 refugees said they spoke English well or very well upon arrival to the U.S. However, close to 70% of them said they spoke little to no English, which naturally presents challenges for integration efforts. Low English skills create entry barriers to schooling, employment, housing, and more.
+- 25% of refugees sampled had obtained a high school diploma prior to arrival, with a similar proportion reporting they had completed primary school. Only 1 in 10 said they held a university degree. While this speaks of the presence of a largely low-skilled population, these figures do not reflect work experience or training received.
+- The second graph shows that the majority of refugees are not in school. A deeper analysis should examine the breakdown of this proportion by age and gender. For those who were in school, close to 50% are seeking to obtain a high school degree or equivalent. 
+- Only 21% of refugees reported having worked since their arrival to the United States. This speaks of the presence of barriers -- either in terms of their own skills or the ability of the system to absorb them as workers -- that prevent them from accessing job opportunities. 
+- As expected, most refugees are employed by the private sector (63%). It is interesting to notice that close to 10% of them have joined the public sector, either at the federal, state, and local level. 
 
 ```{r results='hide', message=FALSE, warning=FALSE}
 multiplot(b6, b7,cols=2)
 ```
-
-#3. Do refugees represent a burden on the tax system?
+## 3. Do refugees represent a burden on the tax system (through benefits)?
 The policy debate in the United States emphasizes the economic burden refugees put on the tax system.  We created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months. We find that: 
 - Few refugees receive cash assistance programs. 
-- The "I don't know" category is more pronounced than for cash asssistance programs, alluding to limitations of the data. In other words, it is possible that survey takers knew about assistance for SSI and SNAP, but not about cash assistance programs such as TANF. 
-- TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. 
-- less than 5% of survey takers utilize cash assistance program; the exception here is SSI, but even those are outweighted by those that do not receive SSI. 
+- The "I don't know" category is more pronounced for cash asssistance programs, alluding to limitations of the data. It is possible that survey takers knew about assistance for SSI and SNAP, but not about cash assistance programs such as TANF. TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. 
+- Less than 5% of survey takers utilize cash assistance program; the exception here being Social Security, but even those are outweighted by those that do not receive SSI. 
 - SNAP is an outlier this is likely the case because income elibigilty thresholds are much lower and are available for households with children. 
 
 ```{r results='hide', message=FALSE, warning=FALSE}
