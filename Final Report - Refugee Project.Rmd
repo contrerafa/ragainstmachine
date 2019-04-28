@@ -1,0 +1,306 @@
+---
+title: "Project Report"
+author: "R against the Machine"
+date: "4/27/2019"
+output:
+  pdf_document: null
+  word_document: default
+  html_document:
+    df_print: paged
+header-includes: \usepackage{setspace}\doublespacing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+require(recipes)
+require(tidyverse)
+require(pdp)
+require(utf8)
+require("skimr")
+require(foreign)
+require(readr)
+library(haven)
+require(scales)
+require(dplyr)
+require(reshape2)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+
+ ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
+```
+##Problem Statement and Background
+Since 1975, the United States government has welcomed over 3 million refugees for resettlement from all over the world (UNHCR, 2018). Recent cuts to refugee resettlement quotas have sparked debate over the program’s national security implications and the ability of refugees to integrate into their host communities. We found that this conversation is often driven by emotional and ideological claims rather than evidence.  Thus, we ask: what does the most recent available data tell us about refugee integration outcomes in the United States?
+
+We seek to answer this question by looking at the Annual Survey of Refugees 2016 (ASR), the most recent, nationally representative survey of refugees who were resettled in the US between 2011 and 2015. The survey was carried out by the Office of Refugee Resettlement at the U.S.Department of Health and Human Services (HHS) and offers a window into respondents' first five years in the US and their progress towards learning English, participating in the workforce, and establishing permanent residence. The dataset includes information on 1,500 households and more than 4,000 individuals, and is available as a STATA database to researchers from accredited universities.
+
+We recognize that survey data can come with problems in terms of its reliability and external validity. However, for this particularly policy area, there is a huge gap in capturing refugee data with very few agencies collecting information (other than ASR, the only other data sources are the Census Bureau data: American Community Survey (ACS) and the New Immigrant Survey). 
+
+Data science tools can equip governments with tools to optimize their institutional procedures.  Scientists at Stanford University have developed a data-driven algorithm that uses supervised machine learning to discover synergies between refugees and resettlement sites, leading to 40 to 70% improvements, on average, in refugees’ employment outcomes relative to current assignment practices (Bansak et al., 2018).  
+
+##Methods
+Exploratory Data Analysis (EDA) allowed us to open-mindedly explore and gain significant insight into the survey results and answer our research question. We were also drawn by the potential that data visualization has to communicate our findings. We had considered creating a linear probability or machine learning model to predict the likelihood of a refugee household being successful at resettling. This approach was discarded because of data availability, the complexity of defining resettlement in strictly quantitative terms, and seeking to maximize our project's reach beyond specialized audiences. 
+
+We summarize the results of our EDA with a dashboard that enables users to navigate the various dimensions of refugee integration. Dashboards have gained significant popularity as a tool to communicate information on news outlets and research institutions.
+
+As a step prior to EDA, we did basic data cleaning and wrangling tasks to ensure the data could be rendered into visualizations.  We then coded the user interface.
+
+##Tools
+We relied on the tidyverse and haven packages for data manipulation, particularly for importing and cleaning STATA data into R. We found difficulties understanding the nature of haven-labelled items that resulted from importing .dta, and discovered differences in coding results when we used the "readstata13" package. We ended up using haven for consistency. 
+
+We employed ggplot and ggplot2 for our visualizations and relied heavily on shiny, shinydashboard, and shinythemes to be able to code the actual dashboard. To host our product online, we created a free account on Shinyapps. Building a Shiny app added an additional dimension to our data exploration, since we had to use design thinking and not only data science skills. This project also made us realize that while R can be a powerful tool for map visualization and dashboard building, this is perhaps not the language's competitive advantage. We wonder whether other (although more expensive) resources such as Tableau would be better suited for these tasks.
+
+Through the coding process we used Git and the Github platform for version control. While it overall served its purpose, we often found that it presented complications when edits were being made in real time. 
+
+#Results
+We have decided to articulate our discussion of results around three questions that capture the main doubts we had going into the process of data exploration: 
+
+## 1. Who exactly are the refugees and where are they?
+We reviewed the demographic composition of the refugee survey data and find: 
+
+- The largest group of refugees were born in Iraq, which counts 1567. following by 611 for Bhutan and 513 for Burma.From the map, we can see that the refugess are mainly from the Middle East, Southeast Asia, and Africa.
+- The South and the North Central have very close resettlement counts, while the Northeast has the least count comparing to other three regions. 
+- Refugees in age groups 16-30 and 31-45 represent the majority of the distribution. take the most count in refugee age distribution. When we factor in gender, we find that there isn't significant difference between male and female refugees.
+```{r results='hide', message=FALSE, warning=FALSE}
+df <- ASRraw
+data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
+name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
+names(data)<-name
+head(data)
+table(data %>% select(C_O_B)) 
+table(data %>% select(S_O_R))
+table(data %>% select(gender)) 
+table(data %>% select(age))
+#age subset
+data <- data %>% mutate(age_group =
+                case_when(
+                  age <= 15 ~ "0-15",
+                  age <= 30 ~ "16-30",
+                  age <= 45 ~ "31-45",
+                  age <= 60 ~ "46-60",
+                  age <= 75 ~ "61-75",) 
+                )
+#drop unreasonable data
+data_filt <- data[data$age<=75,]
+
+#state of resettkement subset
+regionnumber <- data %>% group_by(S_O_R) %>% summarize(count = n())
+colnames(regionnumber)[colnames(regionnumber)=="S_O_R"] <- "area"
+regionnumber$area[regionnumber$area==1] <- "Northeast"
+regionnumber$area[regionnumber$area==2] <- "South"
+regionnumber$area[regionnumber$area==3] <- "North Central"
+regionnumber$area[regionnumber$area==4] <- "West"
+
+###graphs###
+#1
+ggplot(data_filt, aes(x = age,fill=age_group)) +
+  geom_histogram(aes(y=..density..))+labs(title = "Age and Gender Distribution")+
+  facet_wrap(.~gender,scales="free")
+
+#2
+b8 <- ggplot(data_filt,aes(x=age,y=count,fill=age_group))+geom_histogram(aes(y=..count..))
+```
+
+
+```{r results='hide', message=FALSE, warning=FALSE}                         
+#4
+ggplot2_states <- map_data("state")
+ggplot2_states$region <- str_to_title(ggplot2_states$region)
+region_data <- data.frame(region=state.name,area = state.region)
+ggplot2_statesdata <- inner_join(ggplot2_states,region_data,"region")
+ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
+
+g1 <- ggplot(data = ggplot2_statesdata,
+             mapping = aes(x = long, y = lat, group = group,fill=count))+
+  scale_fill_gradient(low = "#330000", high = "#FFFFFF") +
+  geom_polygon(color="gray90",size=0.1)+labs(title = "State of Resettlement Distribution")
+
+g1
+b8
+```
+
+
+```{r results='hide', message=FALSE, warning=FALSE}
+#### Steffi: I create a new dataframe with the variables in which I am interested (benefits) ##
+
+ASR_educ <-
+ASRraw %>%
+select (hhid, qn1h, qn1l, qn2a, qn2b, qn3a, qn3b, qn4a, qn4b, qn4c, qn4e, 
+        qn4j,qn5a, qn5b,qn5c, qn6a, qn8a, qn8b, qn10a, qn10b, qn11a, qn18c, qn20, qn24a, qn25a, qn25b, qn25c)%>%
+rename ("nationality"="qn1h") %>%  #"What is this person's country of citizenship?
+rename ("refugee"="qn1l") %>%  #"Is this person a refugee who entered between 2011 and 2016?
+rename("yearseduc"="qn2a") %>%   #Years of education
+mutate(yearseduc = ifelse(yearseduc>90, NA, yearseduc)) %>% 
+rename("highcert"="qn2b") %>%     #Highest degree obtained before coming to the U.S.?
+rename("job_type"="qn3a") %>%     #Area of work before coming to the U.S.?
+rename("job_act"="qn3b") %>%      #Type of activity before coming to the U.S.?
+rename("eng_arrival"="qn4a") %>%   #On arrival, how well did the person speak English?
+rename("eng_current"="qn4b") %>%   #How well does the person speak English now?
+rename("eng_edu_pre"="qn4c") %>%   #Language instruction before coming to the U.S.? 
+rename("eng_training"="qn4e") %>%  #English training in the past 12 months?
+rename("eng_training_current"="qn4j") %>%  #Currently enrolled in English language training
+rename("work"="qn5a") %>%  #Person worked at a job anytime last week?
+rename("multiplejobs"="qn5b") %>%  #Person worked more than 1 job anytime last week?
+rename("jobs"="qn5c") %>%  #Number of jobs
+rename("workhours"="qn6a") %>%  #Number of hours  
+rename("pretaxinc"="qn8a") %>%  #PreTax income
+rename("incomebasis"="qn8b") %>%  #On what basis is pre-tax income compiled?
+rename("pretaxinc2"="qn10a") %>%  #Earnings from second job
+rename("incomebasis2"="qn10b") %>%  #On what basis is pre-tax income compiled?
+rename("everworked"="qn11a") %>%  #Has this person worked since arrival to the US?
+rename("incometotal"="qn18c") %>% #Income from all sources
+mutate(incometotal= ifelse(incometotal>500000, NA, incometotal)) %>% 
+rename("employer"="qn20") %>% #Is the person working for private, federal, state, local...
+rename("training"="qn24a") %>% #Attended job training in past 12 months?
+rename("school"="qn25a") %>% #Attended school or university in past 12 months?
+rename("schoolfordegree"="qn25b") %>% #"Attending school for degree or certificate?"
+rename("degree"="qn25c") %>%   #"What degree is person attempting to earn?"
+mutate(nationality=as_factor(nationality)) %>%
+mutate(job_type=as_factor(job_type)) %>%
+mutate(job_act=as_factor(job_act)) %>% 
+mutate(eng_arrival=as_factor(eng_arrival)) %>% 
+mutate(eng_current=as_factor(eng_current)) %>% 
+mutate(eng_edu_pre=as_factor(eng_edu_pre)) %>%
+mutate(eng_training_current=as_factor(eng_training_current)) %>% 
+mutate(eng_training=as_factor(eng_training)) %>%
+mutate(highcert=as_factor(highcert)) %>% 
+mutate(work=as_factor(work)) %>% 
+mutate(multiplejobs=as_factor(multiplejobs)) %>% 
+mutate(everworked=as_factor(everworked)) %>% 
+mutate(employer=as_factor(employer)) %>% 
+mutate(training=as_factor(training)) %>% 
+mutate(school=as_factor(school)) %>%
+mutate(schoolfordegree=as_factor(schoolfordegree)) %>% 
+mutate(degree=as_factor(degree))%>% 
+mutate(refugee=as_factor(refugee)) %>% 
+filter(refugee=="Yes")
+
+ASR_ben <-
+ASRraw %>%
+select (qn30a, qn31a, qn32a, qn33a, qn34a)%>%
+rename ("food"="qn30a") %>%  
+rename ("tanf"="qn31a") %>% 
+rename ("rca"="qn32a") %>% 
+rename ("ssi"="qn33a") %>% 
+rename ("ga"="qn34a")
+ 
+### Steffi: Graphs ##
+b1 <- ggplot(ASR_ben, aes(x = as.factor(food))) +
+  labs(title = "SNAP") +
+  geom_bar(position='dodge', width=.5, fill = "steelblue") +
+  coord_flip() +
+  scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                              "8" = "Don't know", "9" = "Refused")) +
+  xlab("") +
+  ylab("")
+
+b2 <- ggplot(ASR_ben, aes(x = as.factor(tanf))) +
+  labs(title = "TANF") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
+  scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                              "8" = "Don't know", "9" = "Refused")) +
+  xlab("") +
+  ylab("")
+
+b3 <- ggplot(ASR_ben, aes(x = as.factor(rca))) +
+  labs(title = "RCA") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
+    scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                              "8" = "Don't know", "9" = "Refused")) +
+  xlab("") +
+  ylab("")
+
+b4 <- ggplot(ASR_ben, aes(x = as.factor(ssi))) +
+  labs(title = "SSI") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
+  scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                              "8" = "Don't know", "9" = "Refused")) + 
+  xlab("") +
+  ylab("")
+
+b5 <- ggplot(ASR_ben, aes(x = as.factor(ga))) +
+  labs(title = "GA") +
+  geom_bar(width=.5, fill = "steelblue") +
+  coord_flip() +
+  scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
+                              "8" = "Don't know", "9" = "Refused")) +
+  xlab("") +
+  ylab("")
+
+b6<- #On arrival, how well did the person speak English?
+ggplot(data=subset(ASR_educ, !is.na(eng_arrival)), aes(x = as.factor(eng_arrival))) + 
+geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
+    geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
+  coord_flip()+
+  labs(title = "English on arrival", x ="", y = "")
+
+
+b7<-ggplot(data=subset(ASR_educ, !is.na(school)), aes(x = as.factor(school))) + 
+geom_bar(aes(y = (..count..)/sum(..count..)), width=.5, fill = "steelblue") +
+    geom_text(aes(y = ((..count..)/sum(..count..)), label = scales::percent((..count..)/sum(..count..))), stat = "count", hjust=-.1) +
+  scale_y_continuous() +
+  coord_flip()+
+  labs(title = "School", x = "", y = "")
+  
+### creates multiplot ###
+multiplot <- function(..., plotlist=NULL, file, cols=3, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+#2. Do refugees contribute to their local economies?
+Do refugees actually contribute to the economy of the countries? Our research finds that...
+
+- RESULT 1
+- RESULT 2
+- RESULT 3
+
+```{r results='hide', message=FALSE, warning=FALSE}
+multiplot(b6, b7,cols=2)
+```
+#3. Do refugees represent a burden on the tax system?
+The policy debate in the United States emphasizes the economic burden refugees put on the tax system.  We created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months. We find that: 
+- Few refugees receive cash assistance programs. 
+- The "I don't know" category is more pronounced than for cash asssistance programs, alluding to limitations of the data. In other words, it is possible that survey takers knew about assistance for SSI and SNAP, but not about cash assistance programs such as TANF. 
+- TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. 
+- less than 5% of survey takers utilize cash assistance program; the exception here is SSI, but even those are outweighted by those that do not receive SSI. 
+- SNAP is an outlier this is likely the case because income elibigilty thresholds are much lower and are available for households with children. 
+```{r results='hide', message=FALSE, warning=FALSE}
+multiplot(b1, b2,cols=2)
+g1
+b8
+```
