@@ -22,6 +22,7 @@ require(scales)
 require(dplyr)
 require(reshape2)
 ```
+
 ```{r}
  ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
 ```
@@ -39,7 +40,7 @@ METHODS
 Our team downlaoded the data, cleaned, and filtered appropriate variables that allowed us easily and quickly tell the story of refugee integration across the United States. Using data visualization tools, we created a dashboard to provide a general idea of the geographic dimension of refugee resettlement and the characteristics of welcoming communities across the country. Our data visualizations and tables essentially “tell a story” about the outcomes of refugees resettled in the US in recent years. We created an interface that allows users to navigate the different visualizations and explore the various dimensions of refugee integration, comparing and contrasting the outcomes attained in these areas. The dashboard is a dynamic tool that that provides concise explanations and guides the user/reader to understand the answers we have found to the research question.
 
 TOOLS
-First, we used Github for version control.We used the following packages: recipes, tidyverse, pdp, utf8, skimr, foreign, Ereadr, haven for data manipulation, and scales and ggplot2 for our visualizations. Additionally, we used shiny, shinydashboard, and shinythemes for our dashboard.   
+First, we used Github for version control. We used the following packages: recipes, tidyverse, pdp, utf8, skimr, foreign, Ereadr, haven for data manipulation, and scales and ggplot2 for our visualizations. Additionally, we used shiny, shinydashboard, and shinythemes for our dashboard.   
 
 Problems: Github was often finicky and required manual interventions for debugging purposes. Additionally, we tried to think of ways to make our dashboard more interactive but the data itself did not much allow for this. However, the user will be able to click through different tabs, and the 'Schooling' subtab below 'Employment' has a drop-down menu with several variables to choose from. 
 
@@ -58,7 +59,7 @@ EMPLOYMENT AND SCHOOLING
 ## Benefits
 BENEFITS
 
-The policy debate in the United States is dominated by the question of how much of an economic burden refugees put on the tax system. For this reason, we created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months.  The visualizations show that for cash asssitance programs, few refugees receive them. For one, cash assistance programs have a higher income threshold. Additionally, the "I don't know" category is more pronounced than for cash asssistance programs, alluding to limitations of the data. In other words, it is possible that survey takers knew about assistance for SSI and SNAP, but not about cash assistance programs such as TANF. Further, specifically TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. Overall, however, less than 5% of survey takers utilize cash assistance program; the exception here is SSI, but even those are outweighted by those that do not receive SSI. Lastly, the outlier is SNAP; this is likely the case because income elibigilty thresholds are much lower and are available for households with children. 
+The policy debate in the United States is dominated by the question of how much of an economic burden refugees put on the tax system. For this reason, we created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months.  The visualizations show that for cash asssistance programs, few refugees receive them. For one, cash assistance programs have a higher income threshold. Additionally, the "I don't know" category is more pronounced than for cash asssistance programs, alluding to limitations of the data. In other words, it is possible that survey takers knew about assistance for SSI and SNAP, but not about cash assistance programs such as TANF. Further, specifically TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. Overall, however, less than 5% of survey takers utilize cash assistance program; the exception here is SSI, but even those are outweighted by those that do not receive SSI. Lastly, the outlier is SNAP; this is likely the case because income elibigilty thresholds are much lower and are available for households with children. 
 
 Overall, 
 ```{r}
@@ -159,8 +160,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=3, layout=NULL) {
 ```{r}
 multiplot(b1, b2, b3, b4, b5, cols=2)
 ```
-
-
 ## Demograhics DIYA - add your results and visualizations here 
 DEMOGRAPHICS
 We reviewed the demographic composition of the refugee survey data in order to get more understanding about the refugees. This analysis looks into the overall situation of refugees in the United States and sets stage for the analysis of employment and benefits.By looking at the data and visualizations below,you should be able to understand the general distribution of the age , gender, country of birth as well as the state of resettlement distribution of the refugees. 
@@ -170,7 +169,8 @@ library(readstata13)
 setwd("~/Downloads")
 df <- read.dta13("2016-ASR_Public_Use_File.dta")
 data <- data.frame("age"=df$qn1d,"gender"=df$qn1f,"country of birth"=df$qn1g,"State originally resettle"=df$qn1k,"country of citizenship"=df$qn1h,"ethnic origin"=df$qn1i)
-```
+
+
 ```{r}
 name <- c("age","gender","C_O_B","S_O_R","C_O_C","ethic_origin")
 names(data)<-name
@@ -212,18 +212,18 @@ ggplot(data_filt, aes(x = age,fill=age_group)) +
   geom_histogram(aes(y=..density..))+
   facet_wrap(.~gender,scales="free")
 
-We can see from this graph that for both genders, the age distribution is generally equal, which means that there is not significant difference between male and female refugees.
+#We can see from this graph that for both genders, the age distribution is generally equal, which means that there is not significant difference between male and female refugees.
 
 #2
 ggplot(data_filt,aes(x=age,y=count,fill=age_group))+geom_histogram(aes(y=..count..))
 
-We can see from this graph that age group 16-30 and 31-45 take the most count in refugee age distribution.
+#We can see from this graph that age group 16-30 and 31-45 take the most count in refugee age distribution.
 
 #3
 ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
   geom_polygon(aes(fill = C_O_B.map$count))
   
-The largest group of refugees were born in Iraq, which counts 1567. following by 611 for Bhutan and 513 for Burma.From the map, we can see that the refugess are mainly from the Middle East, Southeat Asia and Africa. 
+#The largest group of refugees were born in Iraq, which counts 1567. following by 611 for Bhutan and 513 for Burma.From the map, we can see that the refugess are mainly from the Middle East, Southeat Asia, and Africa. 
                             
 #4
 ggplot2_states <- map_data("state")
@@ -238,8 +238,7 @@ g1 <- ggplot(data = ggplot2_statesdata,
   geom_polygon(color="gray90",size=0.1)
 g1
 
-The count for resettlement in each state is 744, 1402, 1382, 1155 respectively. We can see that the South and the North Central have very close resttlement counts, while the Northeast has the least count comparing to other three regions.
+#The count for resettlement in each state is 744, 1402, 1382, 1155 respectively. We can see that the South and the North Central have very close resttlement counts, while the Northeast has the least count comparing to other three regions.
 
-## Note to add somewhere 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
 
