@@ -209,19 +209,19 @@ regionnumber$area[regionnumber$area==4] <- "West"
 ###graphs###
 #1
 ggplot(data_filt, aes(x = age,fill=age_group)) +
-  geom_histogram(aes(y=..density..))+
+  geom_histogram(aes(y=..density..))+ labs(title = "Age and Gender Distribution")+
   facet_wrap(.~gender,scales="free")
 
 #We can see from this graph that for both genders, the age distribution is generally equal, which means that there is not significant difference between male and female refugees.
 
 #2
-ggplot(data_filt,aes(x=age,y=count,fill=age_group))+geom_histogram(aes(y=..count..))
+ggplot(data_filt,aes(x=age,y=count,fill=age_group))+labs(title = "Age Distribution")+geom_histogram(aes(y=..count..))
 
 #We can see from this graph that age group 16-30 and 31-45 take the most count in refugee age distribution.
 
 #3
 ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = C_O_B.map$count))
+  geom_polygon(aes(fill = C_O_B.map$count))+labs(title = "Country of Birth Distribution")
   
 #The largest group of refugees were born in Iraq, which counts 1567. following by 611 for Bhutan and 513 for Burma.From the map, we can see that the refugess are mainly from the Middle East, Southeat Asia, and Africa. 
                             
@@ -235,7 +235,7 @@ ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
 g1 <- ggplot(data = ggplot2_statesdata,
              mapping = aes(x = long, y = lat, group = group,fill=count))+
   scale_fill_gradient(low = "#330000", high = "#FFFFFF") +
-  geom_polygon(color="gray90",size=0.1)
+  geom_polygon(color="gray90",size=0.1)+labs(title = "State of Resettlement Distribution")
 g1
 
 #The count for resettlement in each state is 744, 1402, 1382, 1155 respectively. We can see that the South and the North Central have very close resttlement counts, while the Northeast has the least count comparing to other three regions.
