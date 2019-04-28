@@ -56,7 +56,9 @@ EMPLOYMENT AND SCHOOLING
 ## Benefits
 BENEFITS
 
-The policy debate in the United States is dominated by the question of how much of an economic burden refugees put on the tax system. For this reason, we created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months.  The visualizations show that for cash asssitance programs, few refugees receive them. For one, non-cash assistance programs have a higher income threshold. Additionally, the "i don't know" category is more pronounced than for cash asssistance programs, meaning that ... .... need to add more stuff here why won't this work 
+The policy debate in the United States is dominated by the question of how much of an economic burden refugees put on the tax system. For this reason, we created visualizations showing how many refugees in our sample have chosen to use government benefits in the past 12 months.  The visualizations show that for cash asssitance programs, few refugees receive them. For one, cash assistance programs have a higher income threshold. Additionally, the "I don't know" category is more pronounced than for cash asssistance programs, alluding to limitations of the data. In other words, it is possible that survey takers knew about assistance for SSI and SNAP, but not about cash assistance programs such as TANF. Further, specifically TANF and RCA have eligibility barriers; e.g. RCA is only available for the first five months, and TANF is limited to a cumulative lifetime of up to 5 years. Overall, however, less than 5% of survey takers utilize cash assistance program; the exception here is SSI, but even those are outweighted by those that do not receive SSI. Lastly, the outlier is SNAP; this is likely the case because income elibigilty thresholds are much lower and are available for households with children. 
+
+Overall, 
 ```{r}
 #### Steffi: I create a new dataframe with the variables in which I am interested (benefits) ##
 ASR_ben <-
@@ -70,7 +72,7 @@ rename ("ga"="qn34a")
  
 ### Steffi: Graphs ##
 b1 <- ggplot(ASR_ben, aes(x = as.factor(food))) +
-  labs(title = "Food Stamps") +
+  labs(title = "SNAP") +
   geom_bar(position='dodge', width=.5, fill = "steelblue") +
   coord_flip() +
   scale_x_discrete(labels=c("1" = "No", "2" = "Yes",
