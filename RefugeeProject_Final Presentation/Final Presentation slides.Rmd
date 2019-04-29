@@ -1,0 +1,68 @@
+---
+title: "Refugee Project - Final Presentation"
+author: 'R against the Machine: Diya Wang, Steffi Mangelsdorf, Rafael Contreras Gomez'
+date: "April 29th, 2019"
+output:
+  ioslides_presentation: null
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+## Let's talk about refugees.
+
+In the United States, and around the world, refugee resettlement has been the center of a heated policy debate...
+<br> 
+
+<center><img src="trumprefugees.png"; style="max-width:600px;"></center>
+
+## Research question and background
+
+<h1 align="center" style="color:#B22222;">What does the most recent available data tell us about refugee integration outcomes in the United States?</h1>
+<br>
+
+1. Who exactly are the refugees and where are they?
+2. What do we know about the education and employment outcomes of refugees?
+3. Do refugees represent a burden on the tax system?
+
+## Data
+
+<p align="center" style="color:#4682B4; font-size: 38px;">Annual Survey of Refugees 2016</p>
+
+- Most recent, nationally representative survey of refugees resettled in the US in 2011-2015. 
+- Source: Office of Refugee Resettlement at the U.S. Department of Health and Human Services (HHS)
+- First 5 years in the US. Progress towards learning English, participating in the workforce, and establishing permanent residence. 
+- Dataset: 1,500 households and more than 4,000 individuals.
+- Availabilty: STATA database to researchers from accredited universities.
+
+## Methods
+
+- Bringing data into R (a challenge in itself?)
+- Exploratory Data Analysis (EDA): open-minded exploration!
+- Data visualization
+- Shiny Dashboard: putting our designer's hat on.
+
+<center><img src="dataexploration.png"; style="max-width:500px;"></center>
+
+## Tools
+- ggplot and ggplot2 
+- shiny and shinythemes 
+- shinydashboard 
+- Shinyapps
+- Git and Github
+
+## Results 
+We have compiled the results of our EDA analysis into a dashboard deployed and accessible via ShinyApps. The target audience of the dashboard is the general public interested in discovering the evidence behind refugee outcomes.
+
+https://contrerafa.shinyapps.io/dashboards/
+
+1. Who exactly are the refugees and where are they?
+2. What do we know about the education and employment outcomes of refugees?
+3. Do refugees represent a burden on the tax system?
+
+## Lessons learned & Q & A
+
+- Data availability and tools for public policy
+- Coding: graphs & packages. 
+- Coding: debugging
+- GitHub as a platform for version control 
+- What is R's comparative advantage?
