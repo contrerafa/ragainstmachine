@@ -314,3 +314,13 @@ The policy debate in the United States emphasizes the economic burden refugees p
 ```{r results='hide', message=FALSE, warning=FALSE}
 multiplot(b1, b2,cols=2)
 ```
+
+## Measuring success
+
+For the purpose of this project, we measured success by asking: were we able to build a platform that allowed us (and other users) to explore data related to refugee resettlement? Furthermore, was the platform effective in leading us to answers to the initial research question(s) we set? We have determined our project was successful because it managed to (i) identify relevant, high-quality data from a trustable source;  (ii) apply the data science tools we learned in the course to find answers; and (iii) communicate the results of our finding to a general audience using an appropriate platform (dashboards). 
+
+At the same time, we recognize the limitations of our approach and our project as a whole. For one, EDA is an open-ended process which can arguably lead to different conclusions depending on the perspective (and personal agenda) of the researchers. In this sense, more statistically driven approaches could be perceived as more rigurous in reaching conclusions backed by evidence. 
+
+Moreover, we relied on a single dataset which contained information on a single cohort of refugees, thus pushing us to think about the external validity of our conclusions. This means questioning whether the refugee resettlement outcomes have changed substantially for refugees who arrived after 2015 (last year in our survey).
+
+Thinking about next steps, we believe our project could be a starting point for research that seeks to compile data from the U.S. Census and NGOs into a larger "refugee resettlement outcomes" dataset that can help build the knowledge base on this important policy issue. 

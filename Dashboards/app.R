@@ -24,8 +24,6 @@ require(maps)
 # Loading our main dataset, the 2016 American Survey of Refugees # 
 ASRraw <- read_dta("2016-ASR_Public_Use_File.dta") ##Loading main dataset
 
-
-
 #### Data wrangling ##
 
 ### EMPLOYMENT AND EDUCATION ###
@@ -152,6 +150,7 @@ ui <- dashboardPage(skin="black",
        
       
                                     menuItem("Demographics Overview", startExpanded = TRUE,
+                                    menuSubItem("Age", tabName = "age", icon=icon("child")),
                                     menuSubItem("Age and Gender", tabName = "age_gender", icon=icon("user-check")),
                                     menuSubItem("Country of Origin", tabName = "country_origin", icon=icon("passport")),
                                     menuSubItem("State of Resettlement", tabName = "state_resettle", icon=icon("plane-arrival"))),
@@ -207,17 +206,18 @@ ui <- dashboardPage(skin="black",
                         tabItem("rca", plotOutput("rca")),
                         tabItem("ssi", plotOutput("ssi")),
                         tabItem("ga", plotOutput("ga")),
+                        tabItem("age", plotOutput("age")),
                         tabItem("age_gender", plotOutput("age_gender")),
-                        tabItem("country_origin", plotOutput("country_origin")),
+                        tabItem("country_origin", uiOutput("country_origin")),
                         tabItem("state_resettle", plotOutput("state_resettle")),
-                        
+                        tabItem("about", uiOutput("about")),
                         uiOutput("text2")),
                 
                         
                         fluidRow(
                         
                         hr(),
-                        tags$footer("Refugee Dashboard - All Rights Reserved", align="center"))
+                        tags$footer("Intro to Data Science - McCourt School of Public Policy - Georgetown University", align="center"))
                       )
                     )
 
@@ -249,22 +249,35 @@ server <- function(input, output, session){
 output$age_gender <- renderPlot({
 ggplot(data_filt, aes(x = age,fill=age_group)) +
 geom_histogram(aes(y=..density..))+
-facet_wrap(.~gender,scales="free")})
+facet_wrap(.~gender,scales="free")+labs(title = "Age and Gender Distribution", x="1 - Male, 2 - Female")
+  
+  })
+
+output$age <- renderPlot({
+ ggplot(data_filt,aes(x=age,y=count,fill=age_group))+geom_histogram(aes(y=..count..))+labs(title = "Age Distribution", x="Age")
+})
+
 
 
 
  # The country of origin distribution
 
 
-output$country_origin <- renderPlot({ 
+output$country_origin <- renderUI({ 
    
-world_map = map_data("world")
-cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
-colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
-C_O_B.map <- right_join(cobnumber, world_map, by = "region")
+  fluidPage(
+    tags$img(src="countryoforigin.JPG", width=500, height=300))
+  
+  
+#world_map = map_data("world")
+#cobnumber <- data %>% group_by(C_O_B) %>% summarize(count = n())
+#colnames(cobnumber)[colnames(cobnumber)=="C_O_B"] <- "region"
+#C_O_B.map <- right_join(cobnumber, world_map, by = "region")
    
-ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
- geom_polygon(aes(fill = C_O_B.map$count))}) 
+#ggplot(data = C_O_B.map, aes(x = long, y = lat, group = group)) +
+#geom_polygon(aes(fill = C_O_B.map$count))
+
+  }) 
     
 regionnumber <- data %>% group_by(S_O_R) %>% summarize(count = n())
 colnames(regionnumber)[colnames(regionnumber)=="S_O_R"] <- "area"
@@ -274,7 +287,6 @@ regionnumber$area[regionnumber$area==3] <- "North Central"
 regionnumber$area[regionnumber$area==4] <- "West"  
  
  #The state of resettlement distribution
-
 output$state_resettle <- renderPlot({ 
 ggplot2_states <- map_data("state")
 ggplot2_states$region <- str_to_title(ggplot2_states$region)
@@ -285,11 +297,10 @@ ggplot2_statesdata <- inner_join(ggplot2_statesdata,regionnumber,"area")
 g1 <- ggplot(data = ggplot2_statesdata,
              mapping = aes(x = long, y = lat, group = group,fill=count))+
   scale_fill_gradient(low = "#330000", high = "#FFFFFF") +
-  geom_polygon(color="gray90",size=0.1)
+  geom_polygon(color="gray90",size=0.1)+labs(title = "State of Resettlement Distribution", x="", y="")
 g1})
      
-  
-  output$employment <- renderPlot({
+output$employment <- renderPlot({
     
     graph<-
       ggplot(data=subset(ASR_educ, !is.na(eval(as.name(input$job_outcomes)))), aes(x = as.factor(eval(as.name(input$job_outcomes))))) + 
@@ -298,12 +309,10 @@ g1})
       scale_y_continuous(labels = percent) +
       coord_flip()
     
-  
-  if (input$job_outcomes=="work") {
+if (input$job_outcomes=="work") {
     graph <- graph+labs(title ="Did the person work at a job anytime last week?",
                         x="Worked", 
-                        y = "Percent",
-                        caption = "We can see how the following description presents an important measure of refugee welfare")+
+                        y = "Percent")+
       theme(
         plot.caption = element_text(size=16, hjust=0.5)
       )
@@ -313,8 +322,7 @@ g1})
     if (input$job_outcomes=="everworked") {
       graph <- graph+labs(title ="Has this person worked since their arrival to the US?",
                           x="Worked", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -325,8 +333,7 @@ g1})
   if (input$job_outcomes=="employer") {
     graph <- graph+labs(title = "For what kind of employer is this person working?",
                         x="Employer", 
-                        y = "Percent",
-                        caption = "We can see how the following description presents an important measure of refugee welfare")+
+                        y = "Percent")+
       theme(
         plot.caption = element_text(size=16, hjust=0.5)
       )
@@ -336,8 +343,7 @@ g1})
   if (input$job_outcomes=="training") {
     graph <- graph+labs(title = "Has this person attended job training in past 12 months?",
                         x="Training", 
-                        y = "Percent",
-                        caption = "We can see how the following description presents an important measure of refugee welfare")+
+                        y = "Percent")+
       theme(
         plot.caption = element_text(size=16, hjust=0.5)
       )
@@ -373,7 +379,6 @@ g1})
         geom_density(aes(fill="tomato3"), alpha=0.5) + 
         labs(title="Years of education prior to arrival", 
              subtitle="Years of education reported",
-             caption="We can see how the following description presents an important measure of refugee welfare",
              x="Years of education")+
         theme_classic()+theme(plot.caption = element_text(size=16, hjust=0.5))
       print(graph)
@@ -382,8 +387,7 @@ g1})
     if (input$edu_outcomes=="highcert") {
      graph <- graph+labs(title ="What was the highest certificate you obtained prior to arriving to the U.S?",
                          x="Certificate", 
-                         y = "Percent",
-                         caption = "We can see how the following description presents an important measure of refugee welfare")+
+                         y = "Percent")+
        theme(
          plot.caption = element_text(size=16, hjust=0.5)
        )
@@ -393,8 +397,7 @@ g1})
     if (input$edu_outcomes=="school") {
       graph <- graph+labs(title ="Has this person attended school or university in past 12 months?",
                           x="Attended school", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -405,8 +408,7 @@ g1})
     if (input$edu_outcomes=="degree") {
       graph <- graph+labs(title ="What degree is the person attempting to earn?",
                           x="English proficiency", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -417,8 +419,7 @@ g1})
     if (input$edu_outcomes=="eng_arrival") {
       graph <- graph+labs(title ="On arrival, how well did the person speak English?",
                           x="English proficiency", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -428,8 +429,7 @@ g1})
     if (input$edu_outcomes=="eng_current") {
       graph <- graph+labs(title ="How well does the person speak English now?",
                           x="English proficiency", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -439,8 +439,7 @@ g1})
     if (input$edu_outcomes=="eng_edu_pre") {
       graph <- graph+labs(title ="Did the person receive language instruction before coming to the U.S.?",
                           x="Received training", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -450,8 +449,7 @@ g1})
     if (input$edu_outcomes=="eng_training_current") {
       graph <- graph+labs(title = "Is the person currently enrolled in English language training?",
                           x="Enrolled", 
-                          y = "Percent",
-                          caption = "We can see how the following description presents an important measure of refugee welfare")+
+                          y = "Percent")+
         theme(
           plot.caption = element_text(size=16, hjust=0.5)
         )
@@ -465,7 +463,7 @@ g1})
     if (input$edu_outcomes=="school") {
       fluidPage(
         br(),
-        strong("We can see how the following description presents an important measure of refugee welfare"))}
+        )}
   })
 
     output$rca <- renderPlot({
@@ -557,7 +555,26 @@ g1})
       xlab("") +
       ylab("")
   }) 
+  
+  output$about <- renderUI({
+    fluidPage(
+      tags$h3("The authors"),
+      strong("This project was created by Diya, Steffi, and Rafael, students at the McCourt School of Public Policy at Georgetown University."),
+      tags$h3("Rationale behind the project"),
+      strong("Since 1975, the United States government has welcomed over 3 million refugees for resettlement from all over the world (UNHCR, 2018). 
+      Recent cuts to refugee resettlement quotas have sparked debate over the program’s national security implications and the ability of refugees to integrate into their host communities. 
+      We found that this conversation is often driven by emotional and ideological claims rather than evidence. 
+        Thus, we ask: what does the most recent available data tell us about refugee integration outcomes in the United States?"),
+      strong("We seek to answer this question by looking at the Annual Survey of Refugees 2016 (ASR), the most recent, nationally representative survey of refugees who were resettled in the US between 2011 and 2015. The survey was carried out by the Office of Refugee Resettlement at the U.S.Department of Health and Human Services (HHS)
+      and offers a window into respondents' first five years in the US and their progress towards learning English, participating in the workforce, and establishing permanent residence.
+             The dataset includes information on 1,500 households and more than 4,000 individuals, and is available as a STATA database to researchers from accredited universities.")
+      
+      
+    )    
+  })
+  
 }
+
 
 
 shinyApp(ui = ui, server = server)
